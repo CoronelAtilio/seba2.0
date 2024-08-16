@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!-- Created By CodingNepal - www.codingnepalweb.com -->
+<html lang="en">
+	<%- include('../partials/head.ejs', {titulo: "Directivo" , style: "null" , estilo: "usuario.css" ,
+        sidebar: "directivo.css" }) %>
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+		
+<body>
+	<div class="wrap">
+        <table id="mt" class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Username</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Ty</td>
+                    <td>Stelmach</td>
+                    <td>@TyStelmach</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Andy</td>
+                    <td>Hawkins</td>
+                    <td>@ahawkins</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Lawrence</td>
+                    <td>Bird</td>
+                    <td>@LarryBird</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Sally</td>
+                    <td>Saran</td>
+                    <td>@SalPal</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Heather</td>
+                    <td>Long</td>
+                    <td>@HeatherLong</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div id="contextMenu" class="dropdown clearfix">
+            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu" style="display:block;position:static;margin-bottom:5px;">
+                <li><a tabindex="-1" href="#">Action 1</a></li>
+                <li><a tabindex="-1" href="#">Action 2</a></li>
+                <li><a tabindex="-1" href="#">Some More Actions</a></li>
+                <li class="divider"></li>
+                <li><a tabindex="-1" href="#">Final Action</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        $(function() {
+            var $contextMenu = $("#contextMenu");
+
+            $("body").on("contextmenu", "table tr", function(e) {
+                $contextMenu.css({
+                    display: "block",
+                    left: e.pageX,
+                    top: e.pageY
+                });
+                return false;
+            });
+
+            $('html').click(function() {
+                $contextMenu.hide();
+            });
+
+            $("#contextMenu li a").click(function(e){
+                var f = $(this);
+                alert('Clicked on ' + f.text());
+            });
+        });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/head.ejs', {titulo: "Modificar" , style: "style.css" , estilo: "usuario.css" ,
+    sidebar: "sidebar.css" }) %>
+
+    <body class="hidden">
+        <!-- SIDEBAR -->
+        <%- include('../../partials/sidebar.ejs') %>
+            <!-- CONTENT -->
+            <section id="content">
+                <!-- NAVBAR -->
+                <%- include('../../partials/header.ejs', {form_action: "#" , hidden:'hidden'}) %>
+                    <!-- MAIN -->
+                    <main>
+                        <div class="container">
+                        <!-- Formulario 2 -->
+                        <form id="form2" class="form-content" 
+                            action="/administrador/usuario/docente" method="post">
+                            <div class="form first">
+                                <div class="details personal">
+                                    <span class="title">Docente</span>
+                                    <div class="fields">
+                                        <div class="input-field">
+                                            <label for="apellido_profesor">Apellido/s</label>
+                                            <input name="apellido_profesor" type="text"
+                                                placeholder="Ingresa tu/s apellido/s"
+                                                value="<%= docente.apellido_profesor%>"
+                                                required>
+                                        </div>
+                                        <div class="input-field">
+                                            <label for="nombre_profesor">Nombre/s</label>
+                                            <input name="nombre_profesor" type="text"
+                                                placeholder="Ingresa tu/s nombre/s"
+                                                value="<%= docente.nombre_profesor%>"
+                                                required>
+                                        </div>
+                                        <div class="input-field">
+                                            <label for="fecha_nac_profesor">Fecha de Nacimiento</label>
+                                            <input name="fecha_nac_profesor" type="date"
+                                                placeholder="Ingresa tu fecha de nacimiento"
+                                                value="<%= locals.old2 && old2.fecha_nac_profesor ? old2.fecha_nac_profesor : '' %>"
+                                                required>
+                                        </div>
+                                        <div class="input-field">
+                                            <label for="email_profesor">Email</label>
+                                            <input name="email_profesor" type="text" placeholder="algo@algo.com"
+                                                value="<%= docente.email_profesor%>"
+                                                required>
+                                        </div>
+
+                                        <!--comentario para los errores-->
+                                        <% if (locals.errors2 && locals.errors2.email_profesor) { %>
+                                            <div style="color: red;">
+                                                <%= locals.errors2.email_profesor.msg %>
+                                            </div>
+                                            <% } %>
+
+                                                <div class="input-field">
+                                                    <label for="celular_profesor">Celular</label>
+                                                    <input name="celular_profesor" type="text" placeholder="3855234345"
+                                                        value="<%= docente.celular_profesor%>"
+                                                        required>
+                                                </div>
+
+                                                <!--comentario para los errores-->
+                                                <% if (locals.errors2 && locals.errors2.celular_profesor) { %>
+                                                    <div style="color: red;">
+                                                        <%= locals.errors2.celular_profesor.msg %>
+                                                    </div>
+                                                    <% } %>
+
+
+                                                        <div class="input-field">
+                                                            <label for="nombre_cargo">Cargo</label>
+                                                            <select name="nombre_cargo" required>
+                                                                <option disabled selected>Selecciona Cargo</option>
+                                                                <option>Técnico</option>
+                                                                <option>Director</option>
+                                                                <option>Preceptor</option>
+                                                                <option>Docente</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="input-field">
+                                                            <label for="dni_profesor">DNI</label>
+                                                            <input name="dni_profesor" type="text"
+                                                                placeholder="34094325"
+                                                                value="<%= docente.dni_profesor%>"
+                                                                required>
+                                                        </div>
+
+                                                        <!--comentario para los errores-->
+                                                        <% if (locals.errors2 && locals.errors2.dni_profesor) { %>
+                                                            <div style="color: red;">
+                                                                <%= locals.errors2.dni_profesor.msg %>
+                                                            </div>
+                                                            <% } %>
+
+                                                                <div class="input-field">
+                                                                    <label for="nombre_materia">Materia</label>
+                                                                    <select name="nombre_materia" required>
+                                                                        <option disabled selected>Selecciona Materia
+                                                                        </option>
+                                                                        <option value="matematica">Matemática
+                                                                        </option>
+                                                                        <option value="lengua">Lengua</option>
+                                                                        <option value="fisica">Física</option>
+                                                                        <option value="quimica">Química</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="input-field">
+                                                                    <label for="condicion">Situación</label>
+                                                                    <select name="condicion" required>
+                                                                        <option disabled selected>Selecciona
+                                                                            Situación
+                                                                        </option>
+                                                                        <option>Titular</option>
+                                                                        <option>Suplente</option>
+                                                                        <option>Interino</option>
+                                                                    </select>
+                                                                </div>
+                                    </div>
+                                </div>
+                                <button class="nextBtn" type="submit">
+                                    <span class="btnText">Enviar</span>
+                                    <i class='bx bx-send'></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    </main>
+            </section>
+            <!-- Script de carga inicial -->
+            <script src="/js/administrador_general/all_menues.js"></script>
+            <!-- Script para mejorar la respuesta con "hide" -->
+            <script src="/js/main_menues/usuario.js"></script>
+    </body>
+
+</html>

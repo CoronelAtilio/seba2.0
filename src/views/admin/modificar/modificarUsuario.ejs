@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/head.ejs', {titulo: "Modificar" , style: "style.css" , estilo: "usuario.css" ,
+    sidebar: "sidebar.css" }) %>
+
+    <body class="hidden">
+        <!-- SIDEBAR -->
+        <%- include('../../partials/sidebar.ejs') %>
+            <!-- CONTENT -->
+            <section id="content">
+                <!-- NAVBAR -->
+                <%- include('../../partials/header.ejs', {form_action: "#" , hidden:'hidden'}) %>
+                    <!-- MAIN -->
+                    <main>
+
+                        <div class="container">
+                            <!-- Formulario 1 -->
+                            <form id="form1" class="form-content" action="/administrador/usuario"
+                                method="post">
+                                <div class="form first">
+                                    <div class="details personal">
+                                        <span class="title">Usuario</span>
+                                        <div class="fields">
+                                            <div class="input-field">
+                                                <label for="nombre_usuario">Usuario</label>
+                                                <input type="text" placeholder="Ingresa nombre de Usuario"
+                                                    name="nombre_usuario"
+                                                    value="<%= usuario.nombre_usuario %>"
+                                                    required>
+                                            </div>
+                                            <!--comentario para los errores-->
+                                            <% if (locals.errors1 && locals.errors1.nombre_usuario) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors1.nombre_usuario.msg %>
+                                                </div>
+                                                <% } %>
+
+                                                    <div class="input-field">
+                                                        <label for="password_usuario">Contraseña</label>
+                                                        <input type="password" placeholder="Ingresa tu Contraseña"
+                                                            name="password_usuario" required>
+                                                    </div>
+
+                                                    <div class="input-field">
+                                                        <label for="password_usuario2">Confirma Contraseña</label>
+                                                        <input type="password" placeholder="Repite tu Contraseña"
+                                                            name="password_usuario2" required>
+                                                    </div>
+
+                                                    <!--comentario para los errores-->
+                                                    <% if (locals.errors1 && locals.errors1.password_usuario2) { %>
+                                                        <div style="color: red;">
+                                                            <%= locals.errors1.password_usuario2.msg %>
+                                                        </div>
+                                                        <% } %>
+
+                                                            <div class="input-field">
+                                                                <label for="permisos">Rol</label>
+                                                                <select name="permisos" required>
+                                                                    <option disabled selected>Selecciona Rol de Usuario
+                                                                    </option>
+                                                                    <option>Tecnico</option>
+                                                                    <option>Docente</option>
+                                                                    <option>Director</option>
+                                                                    <option>Preceptor</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="input-field">
+                                                                <label for="dni_profesor">DNI Profesor</label>
+                                                                <input name="dni_profesor" type="text"
+                                                                    placeholder="34094325"
+                                                                    value="<%= locals.old1 && old1.dni_profesor ? old1.dni_profesor : '' %>"
+                                                                    required>
+                                                            </div>
+
+                                                            <!--comentario para los errores-->
+                                                            <% if (locals.errors1 && locals.errors1.dni_profesor) { %>
+                                                                <div style="color: red;">
+                                                                    <%= locals.errors1.dni_profesor.msg %>
+                                                                </div>
+                                                                <% } %>
+
+                                        </div>
+                                    </div>
+                                    <button class="nextBtn" type="submit">
+                                        <span class="btnText">Enviar</span>
+                                        <i class='bx bx-send'></i>
+                                    </button>
+                                </div>
+                            </form>
+
+                        </div>
+                    </main>
+            </section>
+            <!-- Script de carga inicial -->
+            <script src="/js/administrador_general/all_menues.js"></script>
+            <!-- Script para mejorar la respuesta con "hide" -->
+            <script src="/js/main_menues/usuario.js"></script>
+    </body>
+
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/head.ejs', {titulo: "Escritorio", style: "style.css", estilo: "bienvenida.css", sidebar: "sidebar.css"}) %>
+<body class="hidden">
+    <!-- SIDEBAR -->
+    <%- include('../partials/sidebar.ejs') %>
+    <!-- CONTENT -->
+    <section id="content">
+        <!-- NAVBAR -->
+        <%- include('../partials/header.ejs', {form_action: "/welcome/buscar", hidden: 'null'}) %>
+        <!-- MAIN -->
+        <main>
+            <div class="head-title">
+                <div class="left">
+                    <h1>Bienvenido <%= locals.userLogged.usuario %></h1>
+                    <ul class="breadcrumb">
+                        <li>
+                            <a href="#" title="Home">Home</a>
+                        </li>
+                        <li><i class='bx bx-chevron-right'></i></li>
+                        <li>
+                            <a class="active" href="#" title="Escritorio">Escritorio</a>
+                        </li>
+                    </ul>
+                </div>
+                <a href="#" class="btn-download" title="Descargar PDF (próximo)">
+                    <i class='bx bxs-cloud-download'></i>
+                    <span class="text">Descargar PDF (próximo)</span>
+                </a>
+            </div>
+
+            <!--TABLA Resultado Categoria-->
+            <div class="table-data">
+                <div class="order">
+                    <div class="head">
+                        <h3 id="categoria_nombre">Elije Categoría</h3>
+                        <i class='bx bx-search' title="Buscar"></i>
+                        <i class='bx bx-filter' title="Filtrar"></i>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr class="atributos">
+                                <!-- Columnas dinámicas -->
+                            </tr>
+                        </thead>
+                        <tbody class="valores">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="todo">
+                    <div class="head">
+                        <h3>Categorías</h3>
+                        <i class='bx bx-plus' title="Agregar"></i>
+                        <i class='bx bx-filter' title="Filtrar"></i>
+                    </div>
+                    <ul class="todo-list">
+                        <!-- < for (let index = 0; index < tablas.length; index++) { %>
+                            <li class="completed category-button">
+                                <p><= tablas[index].dataValues.Tablas %></p>
+                            </li>
+                        < } %> -->
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </section>
+    <!-- Script de carga inicial -->
+    <script src="/js/administrador_general/all_menues.js"></script>
+    <!-- Script para mejorar la respuesta con "hide" -->
+    <!-- <script src="/js/main_menues/bienvenida.js"></script> -->
+</body>
+</html>

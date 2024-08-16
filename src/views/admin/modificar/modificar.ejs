@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/head.ejs', {titulo: "Modificar" , style: "style.css" , estilo: "usuario.css" ,
+    sidebar: "sidebar.css" }) %>
+
+    <body class="hidden">
+        <!-- SIDEBAR -->
+        <%- include('../../partials/sidebar.ejs') %>
+            <!-- CONTENT -->
+            <section id="content">
+                <!-- NAVBAR -->
+                <%- include('../../partials/header.ejs', {form_action: "#" , hidden:'hidden'}) %>
+                    <!-- MAIN -->
+                    <main>
+                        <ul class="nav-links container">
+                            <li class="upward"><a href="#" data-form="form1">Usuario</a></li>
+                            <li class="center"><a href="#" data-form="form2"> Docente</a></li>
+                            <li class="forward"><a href="#" data-form="form3"> Alumno</a></li>
+                            <li><a href="#"></a></li>
+                        </ul>
+
+                        <div class="container">
+                            <!-- Formulario 1 -->
+                            <div id="form1" class="form-content table-data" style="display: none;">
+                                <div class="order">
+                                    <div class="head">
+                                        <h3>Modificación / Eliminación</h3>
+                                        <i class='bx bx-search' ></i>
+                                        <i class='bx bx-filter' ></i>
+                                    </div>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Usuario</th>
+                                                <th>Fecha</th>
+                                                <th>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% for( let index = 0; index < usuarios.length; index++ ) { %>
+                                            <tr>
+                                                    <td>
+                                                        <p><%= usuarios[index].dataValues.nombre_usuario %></p>
+                                                    </td>
+                                                    <td><%= new Date(usuarios[index].dataValues.createdAt).toISOString().split('T')[0] %></td>
+
+                                                    <td>
+                                                        <div class="nueva_status">
+                                                        <a href="/administrador/usuario/modificar/<%= usuarios[index].dataValues.idusuario %>" class=" process">
+                                                            <button class="status process" type="submit"><i class='bx bx-calendar-exclamation'></i></button>
+                                                        </a>
+
+                                                        <form action="/administrador/usuario/modificar/<%= usuarios[index].dataValues.idusuario %>" class=" pending" method="post">
+                                                            <button class="status pending" type="submit"><i class='bx bx-task-x' ></i></button>
+                                                        </form>
+                                                    </div>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            <!-- Formulario 2 -->
+                            <div id="form2" class="form-content table-data" style="display: none;">
+                                <div class="order">
+                                    <div class="head">
+                                        <h3>Modificación / Eliminación</h3>
+                                        <i class='bx bx-search' ></i>
+                                        <i class='bx bx-filter' ></i>
+                                    </div>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>DNI</th>
+                                                <th>Apellido</th>
+                                                <th>Nombre</th>
+                                                <th>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% for( let index = 0; index < profesores.length; index++ ) { %>
+                                            <tr>
+                                                    <td>
+                                                        <p><%= profesores[index].dataValues.dni_profesor %></p>
+                                                    </td>
+                                                    <td><%= profesores[index].dataValues.apellido_profesor%></td>
+                                                    <td><%= profesores[index].dataValues.nombre_profesor%></td>
+
+                                                    <td>
+                                                        <div class="nueva_status">
+                                                        <a href="/administrador/usuario/modificar/docente/<%= profesores[index].dataValues.idprofesor %>" class=" process">
+                                                            <button class="status process" type="submit"><i class='bx bx-calendar-exclamation'></i></button>
+                                                        </a>
+
+                                                        <form action="/administrador/usuario/modificar/docente/<%= profesores[index].dataValues.idprofesor %>" class=" pending" method="post">
+                                                            <button class="status pending" type="submit"><i class='bx bx-task-x' ></i></button>
+                                                        </form>
+                                                    </div>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+                            <!-- Formulario 3 -->
+                            <div id="form3" class="form-content table-data" style="display: none;">
+                                <div class="order">
+                                    <div class="head">
+                                        <h3>Modificación / Eliminación</h3>
+                                        <i class='bx bx-search' ></i>
+                                        <i class='bx bx-filter' ></i>
+                                    </div>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>DNI</th>
+                                                <th>Apellido</th>
+                                                <th>Nombre</th>
+                                                <th>Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% for( let index = 0; index < alumnos.length; index++ ) { %>
+                                            <tr>
+                                                    <td>
+                                                        <p><%= alumnos[index].dataValues.dni_alumno %></p>
+                                                    </td>
+                                                    <td><%= alumnos[index].dataValues.apellido_alumno%></td>
+                                                    <td><%= alumnos[index].dataValues.nombre_alumno%></td>
+
+                                                    <td>
+                                                        <div class="nueva_status">
+                                                        <a href="/administrador/usuario/modificar/alumno/<%= alumnos[index].dataValues.idalumno %>" class=" process">
+                                                            <button class="status process" type="submit"><i class='bx bx-calendar-exclamation'></i></button>
+                                                        </a>
+
+                                                        <form action="/administrador/usuario/modificar/alumno/<%= alumnos[index].dataValues.idalumno %>" class=" pending" method="post">
+                                                            <button class="status pending" type="submit"><i class='bx bx-task-x' ></i></button>
+                                                        </form>
+                                                    </div>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                                            
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </main>
+            </section>
+            <!-- Script de carga inicial -->
+            <script src="/js/administrador_general/all_menues.js"></script>
+            <!-- Script para mejorar la respuesta con "hide" -->
+            <script src="/js/main_menues/usuario.js"></script>
+    </body>
+
+</html>

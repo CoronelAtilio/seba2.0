@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('../../partials/head.ejs', {titulo: "Modificar" , style: "style.css" , estilo: "usuario.css" ,
+    sidebar: "sidebar.css" }) %>
+
+    <body class="hidden">
+        <!-- SIDEBAR -->
+        <%- include('../../partials/sidebar.ejs') %>
+            <!-- CONTENT -->
+            <section id="content">
+                <!-- NAVBAR -->
+                <%- include('../../partials/header.ejs', {form_action: "#" , hidden:'hidden'}) %>
+                    <!-- MAIN -->
+                    <main>
+                        <div class="container">
+                        <!-- Formulario 3 -->
+                        <form id="form3" class="form-content" 
+                        action="/administrador/usuario/alumno" method="post">
+                        <div class="form first">
+                            <div class="details personal">
+                                <span class="title">Alumno</span>
+                                <div class="fields">
+                                    <div class="input-field">
+                                        <label for="apellido_alumno">Apellido/s</label>
+                                        <input name="apellido_alumno" type="text"
+                                            placeholder="Ingresa tu/s apellido/s"
+                                            value="<%= alumno.apellido_alumno %>"
+                                            required>
+                                    </div>
+                                    <div class="input-field">
+                                        <label for="nombre_alumno">Nombre/s</label>
+                                        <input name="nombre_alumno" type="text"
+                                            placeholder="Ingresa tu/s nombre/s"
+                                            value="<%= alumno.nombre_alumno %>"
+                                            required>
+                                    </div>
+                                    <div class="input-field">
+                                        <label for="fecha_nac_alumno">Fecha de Nacimiento</label>
+                                        <input name="fecha_nac_alumno" type="date"
+                                            placeholder="Ingresa tu fecha de nacimiento"
+                                            value="<%= locals.old3 && old3.fecha_nac_alumno ? old3.fecha_nac_alumno : '' %>"
+                                            required>
+                                    </div>
+                                    <div class="input-field">
+                                        <label for="email_alumno">Email</label>
+                                        <input name="email_alumno" type="text" placeholder="algo@algo.com"
+                                            value="<%= alumno.email_alumno %>"
+                                            required>
+                                    </div>
+
+                                    <!--comentario para los errores-->
+                                    <% if (locals.errors3 && locals.errors3.email_alumno) { %>
+                                        <div style="color: red;">
+                                            <%= locals.errors3.email_alumno.msg %>
+                                        </div>
+                                        <% } %>
+
+                                            <div class="input-field">
+                                                <label for="celular_alumno">Celular</label>
+                                                <input name="celular_alumno" type="text"
+                                                    placeholder="3855234345"
+                                                    value="<%= alumno.celular_alumno %>"
+                                                    required>
+                                            </div>
+
+                                            <!--comentario para los errores-->
+                                            <% if (locals.errors3 && locals.errors3.celular_alumno) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors3.celular_alumno.msg %>
+                                                </div>
+                                                <% } %>
+
+
+                                                    <div class="input-field">
+                                                        <label for="direccion_alumno">Dirección/es</label>
+                                                        <input name="direccion_alumno" type="text"
+                                                            placeholder="Ingresa tu/s dirección/nes"
+                                                            value="<%= alumno.celular_alumno %>"
+                                                            required>
+                                                    </div>
+                                                    <div class="input-field">
+                                                        <label for="dni_alumno">DNI</label>
+                                                        <input name="dni_alumno" type="text"
+                                                            placeholder="34094325"
+                                                            value="<%= alumno.dni_alumno %>"
+                                                            required>
+                                                    </div>
+
+                                                    <!--comentario para los errores-->
+                                                    <% if (locals.errors3 && locals.errors3.dni_alumno) { %>
+                                                        <div style="color: red;">
+                                                            <%= locals.errors3.dni_alumno.msg %>
+                                                        </div>
+                                                        <% } %>
+
+                                                            <div class="input-field">
+                                                                <label for="genero_alumno">Género</label>
+                                                                <select name="genero_alumno" required>
+                                                                    <option disabled selected>Selecciona
+                                                                        Situación
+                                                                    </option>
+                                                                    <option>Masculino</option>
+                                                                    <option>Femenino</option>
+                                                                    <option>Otros</option>
+                                                                </select>
+                                                            </div>
+                                </div>
+                            </div>
+                            <div class="details personal">
+                                <span class="title">Tutor</span>
+                                <div class="fields">
+                                    <div class="input-field">
+                                        <label for="apellido_tutor">Apellido/s</label>
+                                        <input name="apellido_tutor" type="text"
+                                            placeholder="Ingresa tu/s apellido/s"
+                                            value="<%= locals.old3 && old3.apellido_tutor ? old3.apellido_tutor : '' %>">
+                                    </div>
+                                    <div class="input-field">
+                                        <label for="nombre_tutor">Nombre/s</label>
+                                        <input name="nombre_tutor" type="text"
+                                            placeholder="Ingresa tu/s nombre/s"
+                                            value="<%= locals.old3 && old3.nombre_tutor ? old3.nombre_tutor : '' %>">
+                                    </div>
+                                    <div class="input-field">
+                                        <label for="email_tutor">Email</label>
+                                        <input name="email_tutor" type="text" placeholder="algo@algo.com"
+                                            value="<%= locals.old3 && old3.email_tutor ? old3.email_tutor : '' %>">
+                                    </div>
+
+                                    <!--comentario para los errores-->
+                                    <% if (locals.errors3 && locals.errors3.email_tutor) { %>
+                                        <div style="color: red;">
+                                            <%= locals.errors3.email_tutor.msg %>
+                                        </div>
+                                        <% } %>
+
+                                            <div class="input-field">
+                                                <label for="celular_tutor">Celular</label>
+                                                <input name="celular_tutor" type="text" placeholder="3855234345"
+                                                    value="<%= locals.old3 && old3.celular_tutor ? old3.celular_tutor : '' %>">
+                                            </div>
+
+                                            <!--comentario para los errores-->
+                                            <% if (locals.errors3 && locals.errors3.celular_tutor) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors3.celular_tutor.msg %>
+                                                </div>
+                                                <% } %>
+
+
+                                                    <div class="input-field">
+                                                        <label for="direccion_tutor">Dirección/es</label>
+                                                        <input name="direccion_tutor" type="text"
+                                                            placeholder="Ingresa tu/s dirección/nes"
+                                                            value="<%= locals.old3 && old3.direccion_tutor ? old3.direccion_tutor : '' %>">
+                                                    </div>
+                                                    <div class="input-field">
+                                                        <label for="dni_tutor">DNI</label>
+                                                        <input name="dni_tutor" type="text"
+                                                            placeholder="34094325"
+                                                            value="<%= locals.old3 && old3.dni_tutor ? old3.dni_tutor : '' %>">
+                                                    </div>
+
+                                                    <!--comentario para los errores-->
+                                                    <% if (locals.errors3 && locals.errors3.dni_tutor) { %>
+                                                        <div style="color: red;">
+                                                            <%= locals.errors3.dni_tutor.msg %>
+                                                        </div>
+                                                        <% } %>
+                                </div>
+                            </div>
+                            <button class="nextBtn" type="submit">
+                                <span class="btnText">Enviar</span>
+                                <i class='bx bx-send'></i>
+                            </button>
+                        </div>
+                    </form>
+                    </div>
+                    </main>
+            </section>
+            <!-- Script de carga inicial -->
+            <script src="/js/administrador_general/all_menues.js"></script>
+            <!-- Script para mejorar la respuesta con "hide" -->
+            <script src="/js/main_menues/usuario.js"></script>
+    </body>
+
+</html>

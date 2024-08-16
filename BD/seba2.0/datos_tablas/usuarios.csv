@@ -1,0 +1,5 @@
+idusuario,password_usuario,nombre_usuario,fk_iddocente_usuario,fk_idrol_usuario,createdAt,updatedAt,estado_usuario
+1,$2a$10$FkZ6QSz/ul9lHbCHnkXe.OTMzWCh8FRfXtS/Wl4PVHngwfBFsXp0O,Alessandra,1,1,2024-07-26,,1
+2,$2a$10$FkZ6QSz/ul9lHbCHnkXe.OTMzWCh8FRfXtS/Wl4PVHngwfBFsXp0O,Vicky,2,2,2023-03-30,,1
+3,$2a$10$FkZ6QSz/ul9lHbCHnkXe.OTMzWCh8FRfXtS/Wl4PVHngwfBFsXp0O,Lara,3,3,2023-04-19,,1
+4,$2a$10$FkZ6QSz/ul9lHbCHnkXe.OTMzWCh8FRfXtS/Wl4PVHngwfBFsXp0O,Tobias,4,4,2024-03-08,,1

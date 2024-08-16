@@ -1,0 +1,5 @@
+iddocente,dni_docente,email_docente,celular_docente,apellido_docente,nombre_docente,fecha_nac_docente,fk_idcargo_docente,fk_idsituacion_docente,createdAt,updatedAt,estado_docente
+1,8XQ0AY4RH95,ldugdale0@yelp.com,4757056571,Dugdale,Lettie,1982-07-23,2,1,2024-05-30,,1
+2,9N61FA5UG53,phaggata1@usatoday.com,3898359875,Haggata,Parke,1977-03-01,2,1,2024-02-24,,1
+3,5GY9Q82TF07,ralebrooke2@seesaa.net,6015002250,Alebrooke,Ron,1996-08-02,2,1,2024-07-25,,1
+4,1MG0FH9JD36,rjakes3@bizjournals.com,2937121251,Jakes,Remy,1997-08-05,2,1,2024-02-17,,1

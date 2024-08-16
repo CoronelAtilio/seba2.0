@@ -1,0 +1,17 @@
+TRAER UN CURSO DE UNA RESPECTIVA MATERIA
+sesión:
+cursos,materias,iddocente,nombre_cargo,nombre_rol,nombre_usuario
+
+consulta pagina:
+
+select a.dni_alumno,a.apellido_alumno,a.nombre_alumno,n.nota1_nota,n.nota2_nota,n.nota3_nota,n.notadic_nota,n.notafeb_nota,n.notadef_nota,n.obs_nota,n.ciclo_lectivo_nota
+from notas n
+inner join alumnos a
+on a.idalumno = fk_idalumno_nota
+inner join materias_cursos mc
+on mc.idmateriacurso = n.fk_idmateriacurso_nota
+inner join cursos c 
+on c.idcurso = mc.fk_idcurso_materiacurso
+inner JOIN materias mat 
+on mat.idmateria= mc.fk_idmateria_materiacurso
+where c.anio_curso= "primero" AND c.division_curso= "A" AND mc.turno_materiacurso = "mañana" and mat.nombre_materia="lengua"

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('../partials/head.ejs', {titulo: "Docente" , style: "style.css" , estilo: "curso.css" ,
+	sidebar: "sidebar.css" }) %>
+
+	<body class="hidden">
+		<!-- SIDEBAR -->
+		<%- include('../partials/sidebar.ejs') %>
+			<!-- CONTENT -->
+			<section id="content">
+				<!-- NAVBAR -->
+				<%- include('../partials/header.ejs', {form_action: "/curso/buscar" , hidden: 'null' }) %>
+					<!-- MAIN -->
+					<main>
+						<div class="head-title">
+							<div class="left">
+								<h1>
+									<%= locals.userLogged.materias || '' %>
+								</h1>
+								<ul class="breadcrumb">
+									<% if (typeof cursos !=='undefined' ) { %>
+										<li>
+											<a class="active" href="/welcome">Escritorio</a>
+										</li>
+										<li><i class='bx bx-chevron-right'></i></li>
+										<li>
+											<a class="active" href="#">Cursos</a>
+										</li>
+										<% } else if (typeof data !=='undefined' ) { %>
+											<li>
+												<a class="active" href="/curso">Cursos</a>
+											</li>
+											<li><i class='bx bx-chevron-right'></i></li>
+											<li>
+												<a class="active" href="#">Notas</a>
+											</li>
+											<% } %>
+								</ul>
+							</div>
+							<a href="#" class="btn-download">
+								<i class='bx bxs-cloud-download'></i>
+								<span class="text">Download PDF(Próximo)</span>
+							</a>
+						</div>
+
+						<% if (typeof cursos !=='undefined' ) { %>
+							<ul class="box-info">
+								<% for (let index=0; index < cursos.length; index++) { %>
+									<a href="/curso/<%= cursos[index].dataValues.idcurso %>">
+										<li>
+											<i class='bx bxs-calendar-check'></i>
+											<span class="text">
+												<h3>
+													<%= cursos[index].dataValues.cantidad_alumnos %>
+												</h3>
+												<p>
+													<%= cursos[index].dataValues.anio_curso %>
+														<%= cursos[index].dataValues.division_curso %>
+												</p>
+											</span>
+										</li>
+									</a>
+									<% } %>
+							</ul>
+							<% } else if (typeof data !=='undefined' ) { %>
+								<div class="table-data">
+									<div class="order">
+										<table id="mt" class="table">
+											<thead>
+												<tr class="atributos">
+													<th>DNI</th>
+													<th>Apellido</th>
+													<th>Nombre</th>
+													<% const firstDni=Object.keys(data)[0];
+														data[firstDni].notas.forEach(nota=> {
+														%>
+														<th>
+															<%= nota.nombreNota %>
+														</th>
+														<% }) %>
+												</tr>
+											</thead>
+
+											<tbody class="valores">
+												<% Object.keys(data).forEach(dni=> { %>
+													<tr>
+														<td>
+															<%= data[dni].alumno.dni %>
+														</td>
+														<td>
+															<%= data[dni].alumno.apellido %>
+														</td>
+														<td>
+															<%= data[dni].alumno.nombre %>
+														</td>
+														<% data[dni].notas.forEach(nota=> { %>
+															<td>
+																<%= nota.valorNota %>
+															</td>
+															<% }) %>
+													</tr>
+													<% }) %>
+											</tbody>
+										</table>
+									</div>
+								</div>
+								<% } %>
+
+					</main>
+			</section>
+			<!-- Script de carga inicial -->
+			<script src="/js/administrador_general/all_menues.js"></script>
+			<!-- Script para mejorar la respuesta con "hide" -->
+			<script src="/js/main_menues/bienvenida.js"></script>
+	</body>
+
+</html>

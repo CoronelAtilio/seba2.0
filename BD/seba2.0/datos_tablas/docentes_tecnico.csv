@@ -1,0 +1,3 @@
+iddocente,dni_docente,email_docente,celular_docente,apellido_docente,nombre_docente,fecha_nac_docente,fk_idcargo_docente,fk_idsituacion_docente,createdAt,updatedAt,estado_docente
+1,9PJ2X94RX80,bwhetton0@squidoo.com,9159882159,Whetton,Bob,1974-08-24,1,1,2023-10-19,,1
+2,9NN6ED9AX70,mohern1@quantcast.com,9467296237,O' Hern,Mitch,1988-07-04,1,1,2024-06-27,,1

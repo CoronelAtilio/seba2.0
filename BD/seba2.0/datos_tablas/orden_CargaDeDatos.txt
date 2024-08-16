@@ -1,0 +1,11 @@
+cargos
+géneros
+roles
+situaciones
+cursos
+materias
+alumnos
+docentes
+materias_cursos
+notas
+usuarios
