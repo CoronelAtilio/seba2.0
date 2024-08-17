@@ -288,7 +288,7 @@
                                                                             </option>
                                                                             <option value="masculino">Masculino</option>
                                                                             <option value="femenino">Femenino</option>
-                                                                            <option value="otros">Otros</option>
+                                                                            <option value="otro">Otro</option>
                                                                         </select>
                                                                     </div>
                                         </div>
@@ -363,6 +363,80 @@
                                 </div>
                             </form>
 
+                            <!-- Formulario 4 -->
+                            <form id="form4" class="form-content" style="display:none;" action="/administrador/usuario/curso"
+                                method="post">
+                                <div class="form first">
+                                    <div class="details personal">
+                                        <span class="title">Crear Curso</span>
+                                        <div class="fields">
+                                            <div class="input-field">
+                                                <label for="anio_curso">Año</label>
+                                                <input type="text" placeholder="Ingresa Grado del curso"
+                                                    name="anio_curso"
+                                                    value="<%= locals.old4 && old4.anio_curso ? old4.anio_curso : '' %>"
+                                                    required>
+                                            </div>
+                                            <!--comentario para los errores-->
+                                            <% if (locals.errors4 && locals.errors4.anio_curso) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors4.anio_curso.msg %>
+                                                </div>
+                                                <% } %>
+
+
+                                                <div class="input-field">
+                                                    <label for="division_curso">División</label>
+                                                    <input type="text" placeholder="Ingresa División del curso"
+                                                        name="division_curso"
+                                                        value="<%= locals.old4 && old4.division_curso ? old4.division_curso : '' %>"
+                                                        required>
+                                                </div>
+                                                <!--comentario para los errores-->
+                                                <% if (locals.errors4 && locals.errors4.division_curso) { %>
+                                                    <div style="color: red;">
+                                                        <%= locals.errors4.division_curso.msg %>
+                                                    </div>
+                                                    <% } %>
+    
+                                        </div>
+                                    </div>
+                                    <button class="nextBtn" type="submit">
+                                        <span class="btnText">Enviar</span>
+                                        <i class='bx bx-send'></i>
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Formulario 5 -->
+                            <form id="form5" class="form-content" style="display:none;" action="/administrador/usuario/materia"
+                                method="post">
+                                <div class="form first">
+                                    <div class="details personal">
+                                        <span class="title">Crear Materia</span>
+                                        <div class="fields">
+                                            <div class="input-field">
+                                                <label for="nombre_materia">Nombre de la Materia</label>
+                                                <input type="text" placeholder="Ingresa El nombre de la Materia"
+                                                    name="nombre_materia"
+                                                    value="<%= locals.old5 && old5.nombre_materia ? old5.nombre_materia : '' %>"
+                                                    required>
+                                            </div>
+                                            <!--comentario para los errores-->
+                                            <% if (locals.errors5 && locals.errors5.nombre_materia) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors5.nombre_materia.msg %>
+                                                </div>
+                                                <% } %>
+    
+                                        </div>
+                                    </div>
+                                    <button class="nextBtn" type="submit">
+                                        <span class="btnText">Enviar</span>
+                                        <i class='bx bx-send'></i>
+                                    </button>
+                                </div>
+                            </form>
 
                         </div>
                     </main>

@@ -16,6 +16,7 @@ const alu_tutValidationMiddleware = require(path.resolve(__dirname, "../middlewa
 router.get('/usuario',adminControllers.admin)
 
 //CRUD
+//CREAR
 // http://localhost:4000/administrador/usuario
 router.post('/usuario',userValidationMiddleware,adminControllers.crear_usuario)
 
@@ -25,7 +26,14 @@ router.post('/usuario/docente',docenteValidationMiddleware,adminControllers.crea
 // http://localhost:4000/administrador/usuario/alumno
 router.post('/usuario/alumno',alu_tutValidationMiddleware,adminControllers.crear_alu_tut)
 
-//Modificar
+// http://localhost:4000/administrador/usuario/curso
+router.post('/usuario/curso',adminControllers.crear_curso)
+
+// http://localhost:4000/administrador/usuario/materia
+router.post('/usuario/materia',adminControllers.crear_materia)
+
+
+//MODIFICAR
 // http://localhost:4000/administrador/usuario/modificar
 router.get('/usuario/modificar',adminControllers.modificarUser)
 

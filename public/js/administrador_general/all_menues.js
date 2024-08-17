@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('welcome').classList.add('active');
     } else if (currentURL === '/administrador/usuario') {
         document.getElementById('usuarios').classList.add('active');
-    } else if (currentURL === '/curso') {
-        document.getElementById('analytics').classList.add('active');
+    } else if (currentURL === '/preceptor/usuario') {
+        document.getElementById('designar').classList.add('active');
     } else if (currentURL === '/message') {
         document.getElementById('message').classList.add('active');
     } else if (currentURL === '/administrador/usuario/modificar') {

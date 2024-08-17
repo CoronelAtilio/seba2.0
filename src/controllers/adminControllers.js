@@ -175,23 +175,20 @@ module.exports = {
                     old3: req.body,
                 });
             }
-
-            // Extraer y convertir a minúsculas los campos del cuerpo de la solicitud
+    
             let {
                 apellido_alumno, nombre_alumno, fecha_nac_alumno, email_alumno,
                 celular_alumno, direccion_alumno, dni_alumno, genero_alumno,
-                apellido_tutor, nombre_tutor, email_tutor, celular_tutor,
-                direccion_tutor, dni_tutor
+                apellido_tutor, nombre_tutor, email_tutor,
+                celular_tutor, direccion_tutor, dni_tutor
             } = req.body;
-            console.log(req.body);
-            
 
             email_alumno = email_alumno.toLowerCase();
             email_tutor = email_tutor.toLowerCase();
-
+    
             let errorsObj = {};
-
-            // Buscar alumno existente por campos únicos
+    
+            // Buscar alumno existente
             const alumno = await db.Alumno.findOne({
                 attributes: ['dni_alumno', 'email_alumno', 'celular_alumno'],
                 where: {
@@ -202,8 +199,7 @@ module.exports = {
                     ]
                 }
             });
-
-            // Verificar si el alumno ya existe y agregar errores
+    
             if (alumno) {
                 if (alumno.dni_alumno === dni_alumno) {
                     errorsObj.dni_alumno = { msg: 'Este DNI ya existe' };
@@ -215,19 +211,18 @@ module.exports = {
                     errorsObj.celular_alumno = { msg: 'Este Celular ya Existe' };
                 }
             }
-
+    
             if (Object.keys(errorsObj).length > 0) {
                 return res.render('admin/usuario', {
                     errors3: errorsObj,
                     old3: req.body,
                 });
             }
-
-            // Buscar género
+    
             const genero = await db.Genero.findOne({
                 where: { nombre_genero: genero_alumno }
             });
-
+    
             if (!genero) {
                 errorsObj.genero_alumno = { msg: 'Género no encontrado' };
                 return res.render('admin/usuario', {
@@ -235,23 +230,28 @@ module.exports = {
                     old3: req.body,
                 });
             }
-
-            // Buscar o crear tutor
-            let tutor = await db.Tutor.findOne({ where: { dni_tutor } });
+    
             let idNuevoTutor = null;
-
-            if (!tutor && dni_tutor) {
-                const tutorTemp = await db.Tutor.create({
-                    apellido_tutor,
-                    nombre_tutor,
-                    email_tutor,
-                    celular_tutor,
-                    direccion_tutor,
-                    dni_tutor
-                });
-                idNuevoTutor = tutorTemp.idtutor;
+    
+            // Crear tutor solo si se proporciona un DNI válido
+            if (dni_tutor && dni_tutor.trim() !== "") {
+                let tutor = await db.Tutor.findOne({ where: { dni_tutor } });
+    
+                if (!tutor) {
+                    const tutorTemp = await db.Tutor.create({
+                        apellido_tutor,
+                        nombre_tutor,
+                        email_tutor,
+                        celular_tutor,
+                        direccion_tutor,
+                        dni_tutor
+                    });
+                    idNuevoTutor = tutorTemp.idtutor;
+                } else {
+                    idNuevoTutor = tutor.idtutor;
+                }
             }
-
+    
             // Crear alumno
             await db.Alumno.create({
                 apellido_alumno,
@@ -262,17 +262,109 @@ module.exports = {
                 direccion_alumno,
                 dni_alumno,
                 fk_idgenero_alumno: genero.idgenero,
-                fk_idtutor_alumno: tutor ? tutor.idtutor : idNuevoTutor,
-                estado_alumno:1
+                fk_idtutor_alumno: idNuevoTutor, // Puede ser null si no hay tutor
+                estado_alumno: 1
             });
-
-            // Redireccionar tras la creación exitosa
+    
             res.redirect('/administrador/usuario');
-
         } catch (error) {
             console.error("Error al crear el alumno y tutor:", error);
             res.status(500).send('Ocurrió un error al crear el alumno y tutor.');
         }
+    },
+    crear_curso: async (req,res)=>{
+        try {
+              // Validar errores en la solicitud
+            //   const errors = validationResult(req);
+            //   if (!errors.isEmpty()) {
+            //       return res.render('admin/usuario', {
+            //           errors3: errors.mapped(),
+            //           old3: req.body,
+            //       });
+            //   }
+
+            let errorsObj = {};
+            let {anio_curso,division_curso} = req.body;
+            anio_curso=anio_curso.toLowerCase()
+            division_curso=division_curso.toUpperCase()
+            
+            const cursoExistente = await db.Curso.findOne({
+                where: {
+                    anio_curso: anio_curso,
+                    division_curso: division_curso
+                }
+            });
+            if (cursoExistente) {
+                errorsObj.anio_curso = { msg: 'Año y División coincidentes' };
+                return res.render('admin/usuario', {
+                    errors4: errorsObj,
+                    old4: req.body,
+                });
+                 
+            } else {
+
+                await db.Curso.create({
+                    anio_curso: anio_curso,
+                    division_curso: division_curso,
+                    estado_curso: 1
+                });
+
+                return res.redirect('/administrador/usuario');
+            }
+            
+            } catch (error) {
+                console.error("Error al crear el curso:", error);
+                res.status(500).send('Ocurrió un error al crear el curso.');
+            }
+    },
+    crear_materia: async (req,res)=>{
+        try {
+            // Validar errores en la solicitud
+          //   const errors = validationResult(req);
+          //   if (!errors.isEmpty()) {
+          //       return res.render('admin/usuario', {
+          //           errors3: errors.mapped(),
+          //           old3: req.body,
+          //       });
+          //   }
+
+          let errorsObj = {};
+          //limpieza de materia
+          const removeAccents = (str) => {
+            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          }
+          
+          let { nombre_materia } = req.body;
+          nombre_materia = nombre_materia.toLowerCase();
+          nombre_materia = removeAccents(nombre_materia); // Quitar acentos
+          nombre_materia = nombre_materia.trim(); // Quitar espacios al principio y al final
+
+          
+          const materiaExistente = await db.Materia.findOne({
+              where: {
+                  nombre_materia:nombre_materia
+              }
+          });
+          if (materiaExistente) {
+              errorsObj.nombre_materia = { msg: 'Materia existente, prueba otro nombre' };
+              return res.render('admin/usuario', {
+                  errors5: errorsObj,
+                  old5: req.body,
+              });
+               
+          } else {
+
+              await db.Materia.create({
+                  nombre_materia:nombre_materia,
+                  estado_materia: 1
+              });
+
+              return res.redirect('/administrador/usuario');
+            }
+          } catch (error) {
+              console.error("Error al crear la materia:", error);
+              res.status(500).send('Ocurrió un error al crear la materia.');
+          }
     },
     modificarUser: async (req, res) => {
         try {
