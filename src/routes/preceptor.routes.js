@@ -11,7 +11,10 @@ router.get("/usuario", preceptorControllers.index);
 
 //CRUD
 //RELACIONES
-// http://localhost:4000/preceptor/usuario
-// router.get("/", preceptorControllers.index);
+// http://localhost:4000/preceptor/usuario/materiacurso
+router.get("/usuario/materiacurso", preceptorControllers.materiaCurso);
+
+// http://localhost:4000/preceptor/usuario/materiacurso
+router.post("/usuario/materiacurso", preceptorControllers.unirMateriaCurso);
 
 module.exports = router;

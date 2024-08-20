@@ -369,9 +369,9 @@ module.exports = {
     modificarUser: async (req, res) => {
         try {
             let alumnos = await db.Alumno.findAll()
-            let docentees = await db.docente.ofindAll()
+            let docentes = await db.docente.findAll()
             let usuarios = await db.Usuario.findAll()
-            res.render('admin/modificar/modificar', { alumnos, docentees, usuarios })
+            res.render('admin/modificar/modificar', { alumnos, docentes, usuarios })
         } catch (error) {
             console.error("Error modificar:", error);
             res.status(500).send('Ocurrió un error.');

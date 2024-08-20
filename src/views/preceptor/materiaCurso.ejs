@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <%- include('../partials/head.ejs', {titulo: "Materia_curso", style: "style.css", estilo: "materiaCurso.css", sidebar: "sidebar.css"}) %>
+<body class="hidden">
+    <!-- SIDEBAR -->
+    <%- include('../partials/sidebar.ejs') %>
+    <!-- CONTENT -->
+    <section id="content">
+        <!-- NAVBAR -->
+        <%- include('../partials/header.ejs', {form_action: "#", hidden: 'hidden'}) %>
+        <!-- MAIN -->
+        <main>
+            <div class="head-title">
+				<div class="left">
+					<h1>Materia & Curso</h1>
+					<ul class="breadcrumb">
+						<li>
+							<a class="active" href="/preceptor/usuario">Designar</a>
+						</li>
+						<li><i class='bx bx-chevron-right' ></i></li>
+						<li>
+							<a class="active" href="#">Materia & Curso</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<form action="/preceptor/usuario/materiacurso" method="POST">
+			<div class="table-data">
+				<div class="todo">
+					<div class="head">
+						<h3>Materias</h3>
+						<i class='bx bx-plus' ></i>
+						<i class='bx bx-filter' ></i>
+					</div>
+					<ul class="todo-list">
+						<% for(let index = 0; index < materias.length; index++) { %>
+							<li class="not-completed">
+								<p><%= materias[index].nombre_materia %></p>
+								<i class='bx bx-dots-vertical-rounded'>
+									<input type="checkbox" name="materias" value="<%= materias[index].idmateria %>">
+								</i>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+				<div class="todo">
+					<div class="head">
+						<h3>Cursos</h3>
+						<i class='bx bx-plus' ></i>
+						<i class='bx bx-filter' ></i>
+					</div>
+					<ul class="todo-list">
+						<% for(let index = 0; index < cursos.length; index++) { %>
+							<li class="not-completed">
+								<p><%= cursos[index].anio_curso %> <%= cursos[index].division_curso %></p>
+								<i class='bx bx-dots-vertical-rounded'>
+									<input type="checkbox" name="cursos" value="<%= cursos[index].idcurso %>">
+								</i>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+				<div class="todo">
+					<div class="head">
+						<h3>Turno</h3>
+						<i class='bx bx-plus' ></i>
+						<i class='bx bx-filter' ></i>
+					</div>
+					<ul class="todo-list">
+						<% for(let index = 0; index < turnos.length; index++) { %>
+							<li class="not-completed">
+								<p><%= turnos[index].turno_materiacurso %></p>
+								<i class='bx bx-dots-vertical-rounded'>
+									<input type="checkbox" name="turnos" value="<%= turnos[index].turno_materiacurso %>">
+								</i>
+							</li>
+						<% } %>
+					</ul>
+				</div>
+			</div>
+			<button type="submit">Asignar</button>
+		</form>
+        </main>
+    </section>
+    <!-- Script de carga inicial -->
+    <script src="/js/administrador_general/all_menues.js"></script>
+    <!-- Script para mejorar la respuesta con "hide" -->
+    <!-- <script src="/js/main_menues/bienvenida.js"></script> -->
+</body>
+</html>
