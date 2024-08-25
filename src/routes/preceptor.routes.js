@@ -17,4 +17,7 @@ router.get("/usuario/materiacurso", preceptorControllers.materiaCurso);
 // http://localhost:4000/preceptor/usuario/materiacurso
 router.post("/usuario/materiacurso", preceptorControllers.unirMateriaCurso);
 
+// http://localhost:4000/preceptor/usuario/materiacursodocente
+router.get("/usuario/materiacursodocente", preceptorControllers.unirMateriaCursoDocente);
+
 module.exports = router;
