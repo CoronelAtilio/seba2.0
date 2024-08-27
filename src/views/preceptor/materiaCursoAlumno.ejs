@@ -14,14 +14,14 @@
 					<main>
 						<div class="head-title">
 							<div class="left">
-								<h1>Docente & Materia_Curso</h1>
+								<h1>Alumno & Materia_Curso</h1>
 								<ul class="breadcrumb">
 									<li>
 										<a class="active" href="/preceptor/usuario">Designar</a>
 									</li>
 									<li><i class='bx bx-chevron-right'></i></li>
 									<li>
-										<a class="active" href="#">Docente & Materia_Curso</a>
+										<a class="active" href="#">Alumno & Materia_Curso</a>
 									</li>
 								</ul>
 							</div>
@@ -45,40 +45,25 @@
 												</tr>
 											</thead>
 											<tbody>
-												<% for( let index = 0; index < datosFiltrados.length; index++ ) { %>
 													<tr>
 														<td>
-															<p><%= datosFiltrados[index].nombre_materia%></p>
-														</td>
-														<td><%= datosFiltrados[index].anio_curso%> <%= datosFiltrados[index].division_curso%></td>
-														<td><span><%= datosFiltrados[index].turno_materiacurso%></span></td>
-														<td><input type="checkbox" name="materiascursos"
-															value="<%= datosFiltrados[index].idmateriacurso %>"></td>
+
+                                                        </td>
 													</tr>
-												
-												<% } %>
+
 											</tbody>
 										</table>
 									</div>
 									<div class="todo">
 										<div class="head">
-											<h3>Docentes</h3>
+											<h3>Alumnos</h3>
 											<i class='bx bx-search'></i>
 											<i class='bx bx-filter'></i>
 										</div>
 										<ul class="todo-list">
-											<% for( let index = 0; index < docentesFiltrados.length; index++ ) { %>
-												<li class="not-completed">
-													<p>
-														<%= docentesFiltrados[index].apellido_docente %>, <%= docentesFiltrados[index].nombre_docente %>
-													</p>
-													<i class='bx bx-dots-vertical-rounded'>
-														<input type="radio" name="docentes"
-															value="<%= docentesFiltrados[index].iddocente %>">
-													</i>
-												</li>
-											
-											<% } %>
+											<li>
+
+                                            </li>
 										</ul>
 									</div>
 								</div>

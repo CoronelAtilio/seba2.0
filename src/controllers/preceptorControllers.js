@@ -1,5 +1,5 @@
 const db = require('../database/models')
-const { Sequelize, or } = require('sequelize');
+const { Sequelize, or, where } = require('sequelize');
 
 module.exports = {
   index: (req, res) => {
@@ -17,6 +17,7 @@ module.exports = {
         })
       ]);
 
+      //codigo proveniente de "unirMateriaCurso"
       let materiasFinal = null
       if (req.session && req.session.materiasFinal) {
         materiasFinal = req.session.materiasFinal;
@@ -33,15 +34,23 @@ module.exports = {
     try {
       //trabajo union de materias y cursos
       //transformo en arrays
-      let materias = Array.isArray(req.body.materias) ? req.body.materias.map(Number).filter(n => !isNaN(n)) : [Number(req.body.materias)];
-      let cursos = Array.isArray(req.body.cursos) ? req.body.cursos.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null) : [Number(req.body.cursos)];
-      let turnos = Array.isArray(req.body.turnos) ? req.body.turnos.filter(t => t && t !== 'undefined') : [req.body.turnos].filter(t => t && t !== 'undefined');
-
-      //en caso de estar incompleto regresa al sitio
-      if (!materias.length || !cursos.length || !turnos.length) {
-        console.log('paso por aqui');
-        return res.redirect('/preceptor/usuario/materiacurso');
-      }
+      let materias = Array.isArray(req.body.materias) 
+      ? req.body.materias.map(Number).filter(n => !isNaN(n)) 
+      : [Number(req.body.materias)].filter(n => !isNaN(n));
+    
+    let cursos = Array.isArray(req.body.cursos) 
+      ? req.body.cursos.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null) 
+      : [Number(req.body.cursos)].filter(n => !isNaN(n));
+    
+    let turnos = Array.isArray(req.body.turnos) 
+      ? req.body.turnos.filter(t => t && t !== 'undefined') 
+      : [req.body.turnos].filter(t => t && t !== 'undefined');
+    
+    // En caso de estar incompleto regresa al sitio
+    if (!materias.length || !cursos.length || !turnos.length) {
+      console.log('paso por aqui');
+      return res.redirect('/preceptor/usuario/materiacurso');
+    }
 
 
       // Ejecutar el procedimiento almacenado para verificar
@@ -60,7 +69,7 @@ module.exports = {
       const [results] = await db.sequelize.query(`SELECT @valoresError AS valoresError;`);
       const valoresError = JSON.parse(results[0].valoresError)
 
-
+      //probamos si existen errores
       if (valoresError.length > 0) {
         //obtengo foraneas y elementos unicos por filtro
         fkMaterias = valoresError
@@ -110,7 +119,6 @@ module.exports = {
           materia: materiasMap[item.materia],
           curso: cursosMap[item.curso]
         }));
-        console.log(materiasFinal);
 
         req.session.materiasFinal = materiasFinal;
 
@@ -168,12 +176,130 @@ module.exports = {
       res.status(500).send('Ocurrió un error en materia y curso.');
     }
   },
-  unirMateriaCursoDocente: async (req, res) => {
+  MateriaCursoDocente: async (req, res) => {
     try {
-      res.render('preceptor/materiaCursoDocente')
+      //traigo materiascursos con docente null
+      const [materiasCursos, docentes] = await Promise.all([
+        db.Materia_Curso.findAll({
+          where:{
+            fk_iddocente_materiacurso : null
+          },
+          include: [
+              {
+                  model: db.Curso,
+                  as: 'Curso',
+                  attributes: ['anio_curso', 'division_curso'] 
+              },
+              {
+                  model: db.Materia,
+                  as: 'Materia',
+                  attributes: ['nombre_materia']
+              }
+          ],
+          attributes: {
+              exclude: ['fk_idcurso_materiacurso', 'fk_idmateria_materiacurso'] 
+          }
+      }),
+      db.Docente.findAll({
+        attributes: [
+          'iddocente',
+          'apellido_docente',
+          'nombre_docente'
+        ]
+      })
+      ]);
+    
+    
+      // Extrayendo los valores de fk_idcurso_materiacurso y fk_idmateria_materiacurso
+
+      const datosFiltrados = materiasCursos.map(item => ({
+        idmateriacurso: item.idmateriacurso,
+        turno_materiacurso: item.turno_materiacurso,
+        anio_curso: item.Curso.anio_curso,
+        division_curso: item.Curso.division_curso,
+        nombre_materia: item.Materia.nombre_materia
+      }));
+      
+      const docentesFiltrados = docentes.map(item => ({
+        iddocente: item.iddocente,
+          apellido_docente:item.apellido_docente,
+          nombre_docente:item.nombre_docente
+      }))
+      
+      
+      res.render('preceptor/materiaCursoDocente',{datosFiltrados, docentesFiltrados})
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send('Ocurrió un error en materia_curso y docente.');
     }
+  },
+  unirMateriaCursoDocente: async (req, res) => {
+    let materiascursos = Array.isArray(req.body.materiascursos)
+    ? req.body.materiascursos.map(Number).filter(n => !isNaN(n))
+    : [Number(req.body.materiascursos)].filter(n => !isNaN(n));
+  
+  let docentes = Array.isArray(req.body.docentes)
+    ? req.body.docentes.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null)
+    : [Number(req.body.docentes)].filter(n => !isNaN(n));
+  
+  // Verificar si alguno de los arrays está vacío o contiene NaN
+  if (!materiascursos.length || !docentes.length) {
+
+    return res.redirect('/preceptor/usuario/materiacursodocente');
+  }
+    //no hace falta buscar coincidencias ya que traigo elementos con docente null
+
+  await db.Materia_Curso.update(
+    {
+      fk_iddocente_materiacurso: docentes
+    },
+    {
+      where: {
+        idmateriacurso: materiascursos
+      }
+    }
+  );
+  
+    res.redirect('/preceptor/usuario/materiacursodocente')
+    
+  },
+  MateriaCursoAlumno: async (req, res) => {
+    try {
+      
+      res.render('preceptor/materiaCursoAlumno')
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).send('Ocurrió un error en materia_curso y docente.');
+    }
+  },
+  unirMateriaCursoAlumno: async (req, res) => {
+    let materiascursos = Array.isArray(req.body.materiascursos)
+    ? req.body.materiascursos.map(Number).filter(n => !isNaN(n))
+    : [Number(req.body.materiascursos)].filter(n => !isNaN(n));
+  
+  let docentes = Array.isArray(req.body.docentes)
+    ? req.body.docentes.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null)
+    : [Number(req.body.docentes)].filter(n => !isNaN(n));
+  
+  // Verificar si alguno de los arrays está vacío o contiene NaN
+  if (!materiascursos.length || !docentes.length) {
+
+    return res.redirect('/preceptor/usuario/materiacursodocente');
+  }
+    //no hace falta buscar coincidencias ya que traigo elementos con docente null
+
+  await db.Materia_Curso.update(
+    {
+      fk_iddocente_materiacurso: docentes
+    },
+    {
+      where: {
+        idmateriacurso: materiascursos
+      }
+    }
+  );
+  
+    res.redirect('/preceptor/usuario/materiacursodocente')
+    
   }
 };

@@ -18,6 +18,15 @@ router.get("/usuario/materiacurso", preceptorControllers.materiaCurso);
 router.post("/usuario/materiacurso", preceptorControllers.unirMateriaCurso);
 
 // http://localhost:4000/preceptor/usuario/materiacursodocente
-router.get("/usuario/materiacursodocente", preceptorControllers.unirMateriaCursoDocente);
+router.get("/usuario/materiacursodocente", preceptorControllers.MateriaCursoDocente);
+
+// http://localhost:4000/preceptor/usuario/materiacursodocente
+router.post("/usuario/materiacursodocente", preceptorControllers.unirMateriaCursoDocente);
+
+// http://localhost:4000/preceptor/usuario/materiacursoalumno
+router.get("/usuario/materiacursoalumno", preceptorControllers.MateriaCursoAlumno);
+
+// http://localhost:4000/preceptor/usuario/materiacursoalumno
+router.post("/usuario/materiacursoalumno", preceptorControllers.unirMateriaCursoAlumno);
 
 module.exports = router;
