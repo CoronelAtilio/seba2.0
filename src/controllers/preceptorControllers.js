@@ -1,5 +1,8 @@
 const db = require('../database/models')
 const { Sequelize, or, where } = require('sequelize');
+const { Op } = require('sequelize');
+const startOfYear = new Date(new Date().getFullYear(), 0, 1);
+const endOfYear = new Date(new Date().getFullYear() + 1, 0, 1);
 
 module.exports = {
   index: (req, res) => {
@@ -266,40 +269,141 @@ module.exports = {
   MateriaCursoAlumno: async (req, res) => {
     try {
       
-      res.render('preceptor/materiaCursoAlumno')
+      const [materiasCursos, alumnos] = await Promise.all([
+        db.Materia_Curso.findAll({
+            include: [
+                {
+                    model: db.Curso,
+                    as: 'Curso',
+                    attributes: ['anio_curso', 'division_curso']
+                },
+                {
+                    model: db.Materia,
+                    as: 'Materia',
+                    attributes: ['nombre_materia']
+                }
+            ],
+            attributes: {
+                exclude: ['fk_idcurso_materiacurso', 'fk_idmateria_materiacurso']
+            }
+        }),
+        db.Alumno.findAll({
+            where: {
+                createdAt: {
+                    [Op.gte]: startOfYear,
+                    [Op.lt]: endOfYear
+                }
+            },
+            attributes: [
+                'idalumno',
+                'apellido_alumno',
+                'nombre_alumno'
+            ]
+        })
+    ]);
+    
+
+      const datosFiltrados = materiasCursos.map(item => ({
+        idmateriacurso: item.idmateriacurso,
+        turno_materiacurso: item.turno_materiacurso,
+        anio_curso: item.Curso.anio_curso,
+        division_curso: item.Curso.division_curso,
+        nombre_materia: item.Materia.nombre_materia
+      }));
+      
+      const alumnosFiltrados = alumnos.map(item => ({
+        idalumno: item.idalumno,
+          apellido_alumno:item.apellido_alumno,
+          nombre_alumno:item.nombre_alumno
+      }))
+      
+
+      res.render('preceptor/materiaCursoAlumno',{datosFiltrados,alumnosFiltrados})
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send('Ocurrió un error en materia_curso y docente.');
     }
   },
   unirMateriaCursoAlumno: async (req, res) => {
-    let materiascursos = Array.isArray(req.body.materiascursos)
-    ? req.body.materiascursos.map(Number).filter(n => !isNaN(n))
-    : [Number(req.body.materiascursos)].filter(n => !isNaN(n));
+    try {
+        let materiascursos = Array.isArray(req.body.materiascursos)
+            ? req.body.materiascursos.map(Number).filter(n => !isNaN(n))
+            : [Number(req.body.materiascursos)].filter(n => !isNaN(n));
   
-  let docentes = Array.isArray(req.body.docentes)
-    ? req.body.docentes.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null)
-    : [Number(req.body.docentes)].filter(n => !isNaN(n));
-  
-  // Verificar si alguno de los arrays está vacío o contiene NaN
-  if (!materiascursos.length || !docentes.length) {
+        let alumnos = Array.isArray(req.body.alumnos)
+            ? req.body.alumnos.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null)
+            : [Number(req.body.alumnos)].filter(n => !isNaN(n));
 
-    return res.redirect('/preceptor/usuario/materiacursodocente');
-  }
-    //no hace falta buscar coincidencias ya que traigo elementos con docente null
+        let errors = [];
 
-  await db.Materia_Curso.update(
-    {
-      fk_iddocente_materiacurso: docentes
-    },
-    {
-      where: {
-        idmateriacurso: materiascursos
-      }
-    }
-  );
-  
-    res.redirect('/preceptor/usuario/materiacursodocente')
+        // Verificar si alguno de los arrays está vacío o contiene NaN
+        if (!materiascursos.length || !alumnos.length) {
+            errors.push("Error: Faltan materias o alumnos para realizar la inscripción.");
+        }
+        
+        // Primera condición: No repetir la combinación de fk_idmateriacurso_nota y fk_idalumno_nota
+        let coincidencias = await db.Nota.findAll({
+            where: {
+                fk_idalumno_nota: alumnos,
+                fk_idmateriacurso_nota: materiascursos
+            }
+        });
     
-  }
+        if (coincidencias.length > 0) {
+            errors.push("Error: El alumno ya está inscrito en esta materia y curso.");
+        }
+    
+        // Segunda y tercera condición: Verificar curso y turno en materias_cursos
+        let materiasCursosExistentes = await db.Materia_Curso.findAll({
+            where: {
+                idmateriacurso: materiascursos
+            }
+        });
+    
+        let cursosDiferentes = new Set();
+        let turnosDiferentes = new Set();
+    
+        materiasCursosExistentes.forEach(mc => {
+            cursosDiferentes.add(mc.fk_idcurso_materiacurso);
+            turnosDiferentes.add(mc.turno_materiacurso);
+        });
+    
+        if (cursosDiferentes.size > 1) {
+            errors.push("Error: El alumno está asignado a más de un curso.");
+        }
+    
+        if (turnosDiferentes.size > 1) {
+            errors.push("Error: El alumno está asignado a más de un turno.");
+        }
+    
+        // Si hay errores, mostrarlos todos juntos
+        if (errors.length > 0) {
+            console.log(errors.join("\n"));
+            return res.redirect('/preceptor/usuario/materiacursoalumno');
+        }
+        
+        // Obtener el año actual
+        const cicloLectivo = new Date().getFullYear().toString();
+        
+        // Si no hay errores, insertar los registros en la tabla Nota
+        let notas = alumnos.map(alumno => {
+            return materiascursos.map(materiacurso => {
+                return {
+                    fk_idalumno_nota: alumno,
+                    fk_idmateriacurso_nota: materiacurso,
+                    ciclo_lectivo_nota: cicloLectivo, // Año actual
+                    // Otros campos permanecen en NULL por defecto
+                };
+            });
+        }).flat(); // Flatten para obtener un solo array con todas las combinaciones
+        
+        await db.Nota.bulkCreate(notas);
+        
+        res.redirect('/preceptor/usuario/materiacursoalumno');
+    } catch (error) {
+        console.error("Error durante la operación:", error);
+        return res.status(500).send("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.");
+    }
+}
+
 };
