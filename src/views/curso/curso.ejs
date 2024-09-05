@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<%- include('../partials/head.ejs', {titulo: "Docente" , style: "style.css" , estilo: "curso.css" ,
+<%- include('../partials/head.ejs', {titulo: "Docente" , style: "style.css" , estilo: "datatables.css" ,
 	sidebar: "sidebar.css" }) %>
 
 	<body class="hidden">
@@ -9,7 +9,7 @@
 			<!-- CONTENT -->
 			<section id="content">
 				<!-- NAVBAR -->
-				<%- include('../partials/header.ejs', {form_action: "/curso/buscar" , hidden: 'null' }) %>
+				<%- include('../partials/header.ejs', {form_action: "/curso/buscar" , hidden: 'hidden' }) %>
 					<!-- MAIN -->
 					<main>
 						<div class="head-title">
@@ -17,101 +17,93 @@
 								<h1>
 									<%= locals.userLogged.materias || '' %>
 								</h1>
-								<ul class="breadcrumb">
-									<% if (typeof cursos !=='undefined' ) { %>
-										<li>
-											<a class="active" href="/welcome">Escritorio</a>
-										</li>
-										<li><i class='bx bx-chevron-right'></i></li>
-										<li>
-											<a class="active" href="#">Cursos</a>
-										</li>
-										<% } else if (typeof data !=='undefined' ) { %>
-											<li>
-												<a class="active" href="/curso">Cursos</a>
-											</li>
-											<li><i class='bx bx-chevron-right'></i></li>
-											<li>
-												<a class="active" href="#">Notas</a>
-											</li>
-											<% } %>
-								</ul>
+
 							</div>
-							<a href="#" class="btn-download">
-								<i class='bx bxs-cloud-download'></i>
-								<span class="text">Download PDF(Próximo)</span>
-							</a>
+
+							<span class="text">
+								<div class="input-field">
+									<form id="cursoForm" action="/docente" method="POST">
+										<select name="idmateriacurso" class="btn-download" required id="cursoSelect">
+											<option disabled selected>Selecciona Curso</option>
+											<% for( let index=0; index < locals.userLogged.cursos.length; index++ ) { %>
+												<option value="<%= locals.userLogged.cursos[index].idmateriacurso %>">
+													<%= locals.userLogged.cursos[index].anio_curso %> 
+													<%= locals.userLogged.cursos[index].division_curso %> 
+													<%= locals.userLogged.cursos[index].turno %>
+												</option>
+											<% } %>
+										</select>
+										
+									</form>
+								</div>
+							</span>
+
 						</div>
 
-						<% if (typeof cursos !=='undefined' ) { %>
-							<ul class="box-info">
-								<% for (let index=0; index < cursos.length; index++) { %>
-									<a href="/curso/<%= cursos[index].dataValues.idcurso %>">
-										<li>
-											<i class='bx bxs-calendar-check'></i>
-											<span class="text">
-												<h3>
-													<%= cursos[index].dataValues.cantidad_alumnos %>
-												</h3>
-												<p>
-													<%= cursos[index].dataValues.anio_curso %>
-														<%= cursos[index].dataValues.division_curso %>
-												</p>
-											</span>
-										</li>
-									</a>
-									<% } %>
-							</ul>
-							<% } else if (typeof data !=='undefined' ) { %>
-								<div class="table-data">
-									<div class="order">
-										<table id="mt" class="table">
-											<thead>
-												<tr class="atributos">
-													<th>DNI</th>
-													<th>Apellido</th>
-													<th>Nombre</th>
-													<% const firstDni=Object.keys(data)[0];
-														data[firstDni].notas.forEach(nota=> {
-														%>
-														<th>
-															<%= nota.nombreNota %>
-														</th>
-														<% }) %>
+						<div class="table-data">
+							<div class="order">
+								<form action="/ruta-de-post" method="POST">
+									<table id="example" class="display" style="width:100%">
+										<thead>
+											<tr>
+												<th>Apellido</th>
+												<th>Nombre</th>
+												<th>Celular</th>
+												<th>Age</th>
+												<th>Start date</th>
+												<th>Salary</th>
+											</tr>
+										</thead>
+										<tbody>
+											<% for( let index=0; index < alumnos.length; index++ ) { %>
+												<tr>
+													<td>
+														<%= alumnos[index].dataValues.apellido_alumno %>
+													</td>
+													<td>
+														<%= alumnos[index].dataValues.nombre_alumno %>
+													</td>
+													<td>
+														<%= alumnos[index].dataValues.celular_alumno %>
+													</td>
+													<td>61</td>
+													<td>2011-04-25</td>
+													<td>$320,800</td>
 												</tr>
-											</thead>
 
-											<tbody class="valores">
-												<% Object.keys(data).forEach(dni=> { %>
-													<tr>
-														<td>
-															<%= data[dni].alumno.dni %>
-														</td>
-														<td>
-															<%= data[dni].alumno.apellido %>
-														</td>
-														<td>
-															<%= data[dni].alumno.nombre %>
-														</td>
-														<% data[dni].notas.forEach(nota=> { %>
-															<td>
-																<%= nota.valorNota %>
-															</td>
-															<% }) %>
-													</tr>
-													<% }) %>
-											</tbody>
-										</table>
-									</div>
-								</div>
-								<% } %>
-
+												<% } %>
+										</tbody>
+										<tfoot>
+											<tr>
+												<th>Name</th>
+												<th>Position</th>
+												<th>Office</th>
+												<th>Age</th>
+												<th>Start date</th>
+												<th>Salary</th>
+											</tr>
+										</tfoot>
+									</table>
+									<button type="submit">Enviar</button>
+								</form>
+							</div>
+						</div>
 					</main>
 			</section>
 			<!-- Script de carga inicial -->
 			<script src="/js/administrador_general/all_menues.js"></script>
 			<!-- Script para mejorar la respuesta con "hide" -->
 			<script src="/js/main_menues/bienvenida.js"></script>
+			<!-- jQuery local -->
+			<script src="/js/tablas/jquery-3.7.1.min.js"></script>
+			<!-- Incluir DataTables local -->
+			<script src="/js/tablas/datatables.js"></script>
+
+			<!-- Inicializar DataTables -->
+			<!--Detecta el cambio en el select y envía el formulario automáticamente-->
+
+			<script src="/js/tablas/iniTable_detectSelect.js"></script>
+
 	</body>
 
 </html>

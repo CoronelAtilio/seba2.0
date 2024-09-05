@@ -7,36 +7,9 @@ const sequelize = db.sequelize;
 module.exports = {
     index: async (req, res) => {
         try {
-            const cursos = await db.Curso.findAll({
-                attributes: [
-                    'idcurso',
-                    'anio_curso',
-                    'division_curso',
-                    [Sequelize.fn('COUNT', Sequelize.fn('DISTINCT', Sequelize.col('Al_Mat_Not_Curs.fk_idalumno_almatnotcur'))), 'cantidad_alumnos']
-                ],
-                include: [
-                    {
-                        model: db.Al_Mat_Not_Cur,
-                        as: 'Al_Mat_Not_Curs', // Alias definido en la asociación
-                        required: false, // LEFT JOIN
-                        attributes: [],
-                        include: [
-                            {
-                                model: db.Alumno,
-                                as: 'Alumno', // Alias definido en la asociación
-                                required: false, // LEFT JOIN
-                                attributes: []
-                            }
-                        ]
-                    }
-                ],
-                group: ['Curso.idcurso', 'anio_curso', 'division_curso'],
-                order: [
-                    ['anio_curso', 'ASC'],
-                    ['division_curso', 'ASC']
-                ]
-            });
-            res.render('curso/curso', { cursos }); // Pasamos los cursos obtenidos a la vista
+            let alumnos = await db.Alumno.findAll()
+            
+            res.render('curso/curso',{alumnos});
         } catch (error) {
             console.error("Error al obtener cursos:", error);
             res.status(500).send('Ocurrió un error al obtener los cursos.');
@@ -137,6 +110,16 @@ module.exports = {
             // console.log(JSON.stringify(data, null, 2));
 
             res.render('curso/curso',{data});
+        } catch (error) {
+            console.error("Error al obtener cursos:", error);
+            res.status(500).send('Ocurrió un error al obtener los cursos.');
+        }
+    },
+    cursoSelected: async(req,res)=>{
+        try {
+            console.log(req.body);
+            res.redirect('/docente')
+            
         } catch (error) {
             console.error("Error al obtener cursos:", error);
             res.status(500).send('Ocurrió un error al obtener los cursos.');

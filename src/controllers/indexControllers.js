@@ -15,9 +15,9 @@ module.exports = {
                 old: req.body,
             });
         }
-
+    
         const { loginUser, loginPass, rememberMe } = req.body;
-
+    
         try {
             const user = await db.Usuario.findOne({
                 attributes: ['nombre_usuario', 'fk_iddocente_usuario', 'password_usuario'],
@@ -32,63 +32,74 @@ module.exports = {
                     }
                 }
             });
-
+    
             if (!user) {
                 return res.render("index/acceso", {
                     errors: { loginUser: { msg: 'Usuario no encontrado' } },
                     old: req.body,
                 });
             }
-
+    
             const passwordMatch = await bcrypt.compare(loginPass, user.password_usuario);
-
+    
             if (!passwordMatch) {
                 return res.render("index/acceso", {
                     errors: { loginPass: { msg: 'Contraseña incorrecta' } },
                     old: req.body,
                 });
             }
-
+    
             // Configuración de la cookie
             const cookieOptions = {
                 httpOnly: true,
-                maxAge: rememberMe ? 24 * 60 * 60 * 1000 : undefined // 1 día en milisegundos si rememberMe es true
+                maxAge: rememberMe ? 24 * 60 * 60 * 1000 : undefined 
             };
             res.cookie('userSession', loginUser, cookieOptions);
-
-            //Busco materia
-            let materia = await db.Materia_Curso.findAll({
+    
+            // Buscar materias y cursos del docente
+            const materiacurso = await db.Materia_Curso.findAll({
+                attributes: ['idmateriacurso','turno_materiacurso'],
                 include: [{
                     association: 'Materia',
                     attributes: ['nombre_materia']
+                },{
+                    association: 'Curso',
+                    attributes:['anio_curso','division_curso']
                 }],
                 where: {
                     fk_iddocente_materiacurso: user.fk_iddocente_usuario
                 }
-            })
-            let materias = []
-            materia.forEach(docenteMateria => {
-                materias.push(docenteMateria.dataValues.Materia.dataValues.nombre_materia);
             });
-
+    
+            let materias = [...new Set(materiacurso.map(mc => mc.dataValues.Materia.dataValues.nombre_materia))];
+    
+            let cursos = materiacurso.map(docenteCurso => ({
+                idmateriacurso: docenteCurso.dataValues.idmateriacurso,
+                nombre_materia: docenteCurso.dataValues.Materia.dataValues.nombre_materia,
+                anio_curso: docenteCurso.dataValues.Curso.dataValues.anio_curso,
+                division_curso: docenteCurso.dataValues.Curso.dataValues.division_curso,
+                turno: docenteCurso.dataValues.turno_materiacurso
+            }));
+    
             // Configuración de la sesión
             req.session.userLogged = {
                 usuario: loginUser,
                 rol: user.Rol.nombre_rol,
-                materias
+                materias,
+                cursos
             };
-
+            console.log(req.session.userLogged);
+            
             return res.redirect('/welcome');
-
+    
         } catch (error) {
             console.error('Error en la verificación de acceso:', error);
-            // Respuesta genérica para no revelar detalles del error al usuario
             return res.status(500).render("index/acceso", {
                 errors: { general: { msg: 'Ocurrió un error, por favor intenta nuevamente.' } },
                 old: req.body,
             });
         }
-    },
+    },    
     bienvenida: async (req, res) => {
         try {
             // Aquí ejecuto actualización necesaria

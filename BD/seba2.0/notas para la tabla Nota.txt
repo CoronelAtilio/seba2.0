@@ -1,0 +1,6 @@
+se crean alumnos una sola vez, luego se los agrega al primer curso ; hay que tener en cuenta que pueden entrar alumnos entre cursadas
+
+si se va anotar el alumno, se deben dar tres condiciones
+primero: en db.Nota no se puede repetir el id de fk_idmateriacurso_nota con el mismo fk_idalumno_nota
+segundo: en Materia_curso el alumno no puede estar asignado a dos cursos diferentes, por lo tanto fk_idcurso_materiacurso no puede ser diferente acorde al alumno en fk_idalumno_nota
+tercero: en Materia_curso también debe percatarse que el alumno no puede pertenecer además a dos cursos diferentes, por lo  tanto turno_materiacurso no puede ser diferente para cada fk_idalumno_nota

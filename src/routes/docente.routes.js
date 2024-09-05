@@ -9,6 +9,8 @@ const docenteControllers = require(path.resolve(__dirname,"../controllers/docent
 // http://localhost:4000/docente
 router.get("/", docenteControllers.index);
 
+router.post("/", docenteControllers.cursoSelected);
+
 // http://localhost:4000/docente/:id
 router.get("/:id_curso", docenteControllers.nota_alu);
 
