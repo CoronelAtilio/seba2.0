@@ -257,6 +257,11 @@ form .buttons button,
     all: unset;
   }
 
+  #cursoForm{
+    display: flex;
+  }
+  
+
 
 @media (max-width: 750px) {
     .container form {

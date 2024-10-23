@@ -366,10 +366,72 @@ module.exports = {
               res.status(500).send('Ocurrió un error al crear la materia.');
           }
     },
-    modificarUser: async (req, res) => {
+    modificar: async (req, res) => {
+        try {
+            let data = [];
+            let dataSelected = [];
+    
+            if (req.session && req.session.dataSelected) {
+                dataSelected = req.session.dataSelected;
+                delete req.session.dataSelected;
+    
+                // Obtener los keys del primer objeto y almacenarlos en un array (atributos)
+                data = Object.keys(dataSelected[0]);
+    
+                console.log(data);
+                
+                // Aquí dataSelected sigue siendo el array original de objetos
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+            }
+    
+            res.render('admin/modificar/modificar', { data, dataSelected });
+        } catch (error) {
+            console.error("Error modificar:", error);
+            res.status(500).send('Ocurrió un error.');
+        }
+    },
+    
+    modificarTabla: async (req, res) => {
+        try {
+            //llega variable alumnos
+            const data = await db.Alumno.findAll({
+                include: [
+                    {
+                        model: db.Genero,
+                        as: 'Genero',
+                        attributes: ['nombre_genero'] 
+                    }
+                ],
+                attributes: {
+                    exclude: ['fk_idgenero_alumno'] 
+                }
+            });
+
+            const dataSelected = data.map(alumno => ({
+                dni: alumno.dataValues.dni_alumno,
+                Email: alumno.dataValues.email_alumno,
+                Celular: alumno.dataValues.celular_alumno,
+                Apellido: alumno.dataValues.apellido_alumno,
+                Nombre: alumno.dataValues.nombre_alumno,
+                Direccion: alumno.dataValues.direccion_alumno,
+                Nacimiento: alumno.dataValues.fecha_nac_alumno,
+                Genero: alumno.dataValues.Genero.dataValues.nombre_genero 
+              }));
+              
+            req.session.dataSelected = dataSelected;
+            console.log(req.session.dataSelected);
+            
+            
+            res.redirect('/administrador/usuario/modificar')
+        } catch (error) {
+            console.error("Error modificar:", error);
+            res.status(500).send('Ocurrió un error.');
+        }
+    },
+    modificarRelacion: async (req, res) => {
         try {
             let alumnos = await db.Alumno.findAll()
-            let docentes = await db.docente.findAll()
+            let docentes = await db.Docente.findAll()
             let usuarios = await db.Usuario.findAll()
             res.render('admin/modificar/modificar', { alumnos, docentes, usuarios })
         } catch (error) {

@@ -2,21 +2,21 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const switchMode = document.getElementById('switch-mode');
 
-    // Restore sidebar state
+    // Restaurar el estado del sidebar
     if (localStorage.getItem('sidebar-state') === 'hidden') {
         sidebar.classList.add('hide');
     }
 
-    // Restore dark mode state
+    // Restaurar el estado del modo oscuro
     if (localStorage.getItem('dark-mode') === 'enabled') {
         document.body.classList.add('dark');
         switchMode.checked = true;
     }
 
-    // Show body content
+    // Mostrar el contenido del body
     document.body.classList.remove('hidden');
 
-    // Set active sidebar item
+    // Configurar el ítem activo en el menú lateral
     const currentURL = window.location.pathname;
     const menuItems = document.querySelectorAll('.side-menu.top li');
 
@@ -34,17 +34,18 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('message').classList.add('active');
     } else if (currentURL === '/administrador/usuario/modificar') {
         document.getElementById('team').classList.add('active');
+    } else if (currentURL === '/docente'){
+        document.getElementById('notas').classList.add('active');
     }
 
-    // Toggle sidebar
+    // Alternar la visibilidad del sidebar
     const menuBar = document.querySelector('#content nav .bx.bx-menu');
-
     menuBar.addEventListener('click', function () {
         sidebar.classList.toggle('hide');
         localStorage.setItem('sidebar-state', sidebar.classList.contains('hide') ? 'hidden' : 'visible');
     });
 
-    // Search button behavior
+    // Comportamiento del botón de búsqueda
     const searchButton = document.querySelector('#content nav form .form-input button');
     const searchButtonIcon = document.querySelector('#content nav form .form-input button .bx');
     const searchForm = document.querySelector('#content nav form');
@@ -61,24 +62,29 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Switch mode (dark mode)
+    // Cambiar el modo oscuro
     switchMode.addEventListener('change', function () {
         document.body.classList.toggle('dark', this.checked);
         localStorage.setItem('dark-mode', this.checked ? 'enabled' : 'disabled');
     });
-});
 
-// Window resize event
-window.addEventListener('resize', function () {
-    const sidebar = document.getElementById('sidebar');
-    const searchButtonIcon = document.querySelector('#content nav form .form-input button .bx');
-    const searchForm = document.querySelector('#content nav form');
+    // Evento de redimensionamiento de la ventana
+    window.addEventListener('resize', function () {
+        const searchButtonIcon = document.querySelector('#content nav form .form-input button .bx');
+        const searchForm = document.querySelector('#content nav form');
 
-    if (window.innerWidth < 768) {
-        sidebar.classList.add('hide');
-        localStorage.setItem('sidebar-state', 'hidden');
-    } else if (window.innerWidth > 576) {
-        searchButtonIcon.classList.replace('bx-x', 'bx-search');
-        searchForm.classList.remove('show');
-    }
+        if (window.innerWidth < 768) {
+            sidebar.classList.add('hide');
+            localStorage.setItem('sidebar-state', 'hidden');
+        } else {
+            if (localStorage.getItem('sidebar-state') === 'visible') {
+                sidebar.classList.remove('hide');
+            }
+        }
+
+        if (window.innerWidth > 576) {
+            searchButtonIcon.classList.replace('bx-x', 'bx-search');
+            searchForm.classList.remove('show');
+        }
+    });
 });

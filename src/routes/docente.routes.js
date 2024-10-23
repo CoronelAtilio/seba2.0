@@ -12,6 +12,6 @@ router.get("/", docenteControllers.index);
 router.post("/", docenteControllers.cursoSelected);
 
 // http://localhost:4000/docente/:id
-router.get("/:id_curso", docenteControllers.nota_alu);
+router.post("/nota", docenteControllers.nota_alu);
 
 module.exports = router;

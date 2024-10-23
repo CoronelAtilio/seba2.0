@@ -14,7 +14,7 @@
 					<main>
 						<div class="head-title">
 							<div class="left">
-								<h1>Alumno & Materia_Curso</h1>
+								<h1>Alumno & Curso</h1>
 								<ul class="breadcrumb">
 									<li>
 										<a class="active" href="/preceptor/usuario">Designar</a>
@@ -29,59 +29,43 @@
 
 						<form action="/preceptor/usuario/materiacursoalumno" method="POST">
 
-								<div class="table-data">
-									<div class="order">
-										<div class="head">
-											<h3>Materias & Cursos</h3>
-											<i class='bx bx-search'></i>
-											<i class='bx bx-filter'></i>
-										</div>
-										<table>
-											<thead>
-												<tr>
-													<th>Materia</th>
-													<th>Año y División</th>
-													<th>Turno</th>
-												</tr>
-											</thead>
-											<tbody>
-												<% for( let index = 0; index < datosFiltrados.length; index++ ) { %>
-													<tr>
-														<td>
-															<p><%= datosFiltrados[index].nombre_materia%></p>
-														</td>
-														<td><%= datosFiltrados[index].anio_curso%> <%= datosFiltrados[index].division_curso%></td>
-														<td><span><%= datosFiltrados[index].turno_materiacurso%></span></td>
-														<td><input type="checkbox" name="materiascursos"
-															value="<%= datosFiltrados[index].idmateriacurso %>"></td>
-													</tr>
-												
-												<% } %>
-											</tbody>
-										</table>
+							<div class="table-data">
+								<div class="todo">
+									<div class="head">
+										<h3>Año // División // Turno</h3>
+										<i class='bx bx-plus' ></i>
+										<i class='bx bx-filter' ></i>
 									</div>
-									<div class="todo">
-										<div class="head">
-											<h3>Alumnos</h3>
-											<i class='bx bx-search'></i>
-											<i class='bx bx-filter'></i>
-										</div>
-										<ul class="todo-list">
-											<% for( let index = 0; index < alumnosFiltrados.length; index++ ) { %>
-												<li class="not-completed">
-													<p>
-														<%= alumnosFiltrados[index].apellido_alumno %>, <%= alumnosFiltrados[index].nombre_alumno %>
-													</p>
-													<i class='bx bx-dots-vertical-rounded'>
-														<input type="checkbox" name="alumnos"
-															value="<%= alumnosFiltrados[index].idalumno %>">
-													</i>
-												</li>
-											
-											<% } %>
-										</ul>
-									</div>
+									<ul class="todo-list">
+										<% for(let index = 0; index < cursosFiltrados.length; index++) { %>
+											<li class="not-completed">
+												<p><%= cursosFiltrados[index].anio_curso %> // <%= cursosFiltrados[index].division_curso %> // <%= cursosFiltrados[index].nombre_turno %></p>
+												<i class='bx bx-dots-vertical-rounded'>
+													<input type="radio" name="cursos" value="<%=cursosFiltrados[index].idcurso%>">
+												</i>
+											</li>
+										<% } %>
+									</ul>
 								</div>
+								
+								<div class="todo">
+									<div class="head">
+										<h3>Alumnos</h3>
+										<i class='bx bx-plus' ></i>
+										<i class='bx bx-filter' ></i>
+									</div>
+									<ul class="todo-list">
+										<% for(let index = 0; index < alumnosFiltrados.length; index++) { %>
+											<li class="not-completed">
+												<p><%= alumnosFiltrados[index].apellido_alumno %>, <%= alumnosFiltrados[index].nombre_alumno %></p>
+												<i class='bx bx-dots-vertical-rounded'>
+													<input type="checkbox" name="alumnos" value="<%= alumnosFiltrados[index].idalumno %>">
+												</i>
+											</li>
+										<% } %>
+									</ul>
+								</div>
+							</div>
 								<button type="submit">Asignar</button>
 						</form>
 					</main>

@@ -2,108 +2,215 @@
 <html lang="en">
 <%- include('../partials/head.ejs', {titulo: "Docente" , style: "style.css" , estilo: "datatables.css" ,
 	sidebar: "sidebar.css" }) %>
+	<!--Variables-->
+	<% let materia=[...new Set(locals.userLogged.cursos.map((materia)=>{return materia.nombre_materia}))]%>
+		<% let curso=[...new Set(locals.userLogged.cursos.map((curso)=> {
+			return curso.anio_curso;
+			}))];
+			%>
+			<% let division=[...new Set(locals.userLogged.cursos.map((curso)=> {
+				return curso.division_curso;
+				}))];
+				%>
 
-	<body class="hidden">
-		<!-- SIDEBAR -->
-		<%- include('../partials/sidebar.ejs') %>
-			<!-- CONTENT -->
-			<section id="content">
-				<!-- NAVBAR -->
-				<%- include('../partials/header.ejs', {form_action: "/curso/buscar" , hidden: 'hidden' }) %>
-					<!-- MAIN -->
-					<main>
-						<div class="head-title">
-							<div class="left">
-								<h1>
-									<%= locals.userLogged.materias || '' %>
-								</h1>
+				<body class="hidden">
+					<!-- SIDEBAR -->
+					<%- include('../partials/sidebar.ejs') %>
+						<!-- CONTENT -->
+						<section id="content">
+							<!-- NAVBAR -->
+							<%- include('../partials/header.ejs', {form_action: "/curso/buscar" , hidden: 'hidden' }) %>
+								<!-- MAIN -->
+								<main>
+									<div class="head-title">
+										<div class="left">
 
-							</div>
+											<% if (nombre_materia) { %>
+												<h1>
+													<%= nombre_materia %>
+												</h1>
+												<% } else { %>
+													<p>No se encontró la materia</p>
+													<% } %>
 
-							<span class="text">
-								<div class="input-field">
-									<form id="cursoForm" action="/docente" method="POST">
-										<select name="idmateriacurso" class="btn-download" required id="cursoSelect">
-											<option disabled selected>Selecciona Curso</option>
-											<% for( let index=0; index < locals.userLogged.cursos.length; index++ ) { %>
-												<option value="<%= locals.userLogged.cursos[index].idmateriacurso %>">
-													<%= locals.userLogged.cursos[index].anio_curso %> 
-													<%= locals.userLogged.cursos[index].division_curso %> 
-													<%= locals.userLogged.cursos[index].turno %>
-												</option>
-											<% } %>
-										</select>
-										
-									</form>
-								</div>
-							</span>
+										</div>
 
-						</div>
+										<form id="cursoForm" action="/docente" method="POST">
+											<span class="text">
+												<div class="input-field">
+													<select name="cursociclo" class="btn-download" required
+														id="cursoSelect">
+														<option disabled selected>Selecciona Año</option>
+														<% for( let index=0; index < curso.length; index++ ) { %>
+															<option value="<%= curso[index] %>">
+																<%= curso[index] %>
 
-						<div class="table-data">
-							<div class="order">
-								<form action="/ruta-de-post" method="POST">
-									<table id="example" class="display" style="width:100%">
-										<thead>
-											<tr>
-												<th>Apellido</th>
-												<th>Nombre</th>
-												<th>Celular</th>
-												<th>Age</th>
-												<th>Start date</th>
-												<th>Salary</th>
-											</tr>
-										</thead>
-										<tbody>
-											<% for( let index=0; index < alumnos.length; index++ ) { %>
-												<tr>
-													<td>
-														<%= alumnos[index].dataValues.apellido_alumno %>
-													</td>
-													<td>
-														<%= alumnos[index].dataValues.nombre_alumno %>
-													</td>
-													<td>
-														<%= alumnos[index].dataValues.celular_alumno %>
-													</td>
-													<td>61</td>
-													<td>2011-04-25</td>
-													<td>$320,800</td>
-												</tr>
+															</option>
+															<% } %>
+													</select>
+												</div>
+											</span>
 
-												<% } %>
-										</tbody>
-										<tfoot>
-											<tr>
-												<th>Name</th>
-												<th>Position</th>
-												<th>Office</th>
-												<th>Age</th>
-												<th>Start date</th>
-												<th>Salary</th>
-											</tr>
-										</tfoot>
-									</table>
-									<button type="submit">Enviar</button>
-								</form>
-							</div>
-						</div>
-					</main>
-			</section>
-			<!-- Script de carga inicial -->
-			<script src="/js/administrador_general/all_menues.js"></script>
-			<!-- Script para mejorar la respuesta con "hide" -->
-			<script src="/js/main_menues/bienvenida.js"></script>
-			<!-- jQuery local -->
-			<script src="/js/tablas/jquery-3.7.1.min.js"></script>
-			<!-- Incluir DataTables local -->
-			<script src="/js/tablas/datatables.js"></script>
+											<span class="text">
+												<div class="input-field">
+													<select name="cursociclo" class="btn-download" required
+														id="divisionSelect">
+														<option disabled selected>Selecciona División</option>
+														<% for( let index=0; index < division.length; index++ ) { %>
+															<option value="<%= division[index] %>">
+																<%= division[index] %>
 
-			<!-- Inicializar DataTables -->
-			<!--Detecta el cambio en el select y envía el formulario automáticamente-->
+															</option>
+															<% } %>
+													</select>
+												</div>
+											</span>
 
-			<script src="/js/tablas/iniTable_detectSelect.js"></script>
+											<span class="text">
+												<div class="input-field">
+													<select name="cursociclo" class="btn-download" required
+														id="cicloSelect">
+														<option disabled selected>Selecciona Ciclo</option>
+														<% const currentYear=new Date().getFullYear(); for (let
+															year=currentYear; year>= currentYear - 5; year--) {
+															%>
+															<option value="<%= year %>">
+																<%= year %>
+															</option>
+															<% } %>
+													</select>
 
-	</body>
+												</div>
+											</span>
+
+
+											<span class="text"></span>
+											<div class="input-field">
+												<select name="cursociclo" class="btn-download" required
+													id="materiaSelect">
+													<option disabled selected>Selecciona Materia</option>
+													<% for( let index=0; index < materia.length; index++ ) { %>
+														<option value="<%= materia[index] %>">
+															<%= materia[index] %>
+														</option>
+														<% } %>
+												</select>
+											</div>
+											</span>
+										</form>
+
+
+									</div>
+
+									<div class="table-data">
+										<div class="order">
+											<form action="/docente/nota" method="POST">
+												<table id="example" class="display" style="width:100%">
+													<thead>
+														<tr>
+															<th>DNI</th>
+															<th>Apellido, Nombre</th>
+															<th>Nota 1</th>
+															<th>Nota 2</th>
+															<th>Nota 3</th>
+															<th>Nota Diciembre</th>
+															<th>Nota Febrero</th>
+															<th>Nota Final</th>
+														</tr>
+													</thead>
+													<tbody>
+														<% if (alumnos.length> 0) { %>
+															<% for (let index=0; index < alumnos.length; index++) { %>
+																<tr>
+																	<td>
+																		<%= alumnos[index].dataValues.Alumno.dataValues.dni_alumno
+																			%>
+																	</td>
+																	<td>
+																		<%= alumnos[index].dataValues.Alumno.dataValues.apellido_alumno
+																			%>, <%= alumnos[index].dataValues.Alumno.dataValues.nombre_alumno
+																			%>
+																	</td>
+																	<td>
+																		<input type="number"
+																			name="nota1_<%= alumnos[index].dataValues.idnota %>"
+																			value="<%= alumnos[index].dataValues.nota1_nota %>"
+																			class="nota-input" min="0" max="10"
+																			step="0.1">
+																	</td>
+																	<td>
+																		<input type="number"
+																			name="nota2_<%= alumnos[index].dataValues.idnota %>"
+																			value="<%= alumnos[index].dataValues.nota2_nota %>"
+																			class="nota-input" min="0" max="10"
+																			step="0.1">
+																	</td>
+																	<td>
+																		<input type="number"
+																			name="nota3_<%= alumnos[index].dataValues.idnota %>"
+																			value="<%= alumnos[index].dataValues.nota3_nota %>"
+																			class="nota-input" min="0" max="10"
+																			step="0.1">
+																	</td>
+																	<td>
+																		<input type="number"
+																			name="notadic_<%= alumnos[index].dataValues.idnota %>"
+																			value="<%= alumnos[index].dataValues.notadic_nota %>"
+																			class="nota-input" min="0" max="10"
+																			step="0.1">
+																	</td>
+																	<td>
+																		<input type="number"
+																			name="notafeb_<%= alumnos[index].dataValues.idnota %>"
+																			value="<%= alumnos[index].dataValues.notafeb_nota %>"
+																			class="nota-input" min="0" max="10"
+																			step="0.1">
+																	</td>
+																	<td>
+																		<input type="number"
+																			name="notadef_<%= alumnos[index].dataValues.idnota %>"
+																			value="<%= alumnos[index].dataValues.notadef_nota %>"
+																			class="nota-input" min="0" max="10"
+																			step="0.1">
+																	</td>
+																</tr>
+																<% } %>
+																	<% } %>
+													</tbody>
+
+													<tfoot>
+														<tr>
+															<th>DNI</th>
+															<th>Apellido, Nombre</th>
+															<th>Nota 1</th>
+															<th>Nota 2</th>
+															<th>Nota 3</th>
+															<th>Nota Diciembre</th>
+															<th>Nota Febrero</th>
+															<th>Nota Final</th>
+														</tr>
+													</tfoot>
+												</table>
+												<button type="submit">Enviar</button>
+											</form>
+										</div>
+									</div>
+								</main>
+						</section>
+						<!-- Script de carga inicial -->
+						<script src="/js/administrador_general/all_menues.js"></script>
+						<!-- Script para mejorar la respuesta con "hide" -->
+						<script src="/js/main_menues/bienvenida.js"></script>
+						<!-- jQuery local -->
+						<script src="/js/tablas/jquery-3.7.1.min.js"></script>
+						<!-- Incluir DataTables local -->
+						<script src="/js/tablas/datatables.js"></script>
+
+						<!-- Inicializar DataTables -->
+						<!--Detecta el cambio en el select y envía el formulario automáticamente-->
+
+						<script src="/js/tablas/iniTable_detectSelect.js"></script>
+
+				</body>
 
 </html>

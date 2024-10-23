@@ -30,14 +30,21 @@ async function userLoggedMiddleware(req, res, next) {
 
             if (usuarioCookie) {
                 const materiacurso = await db.Materia_Curso.findAll({
-                    attributes: ['turno_materiacurso'],
-                    include: [{
-                        association: 'Materia',
-                        attributes: ['nombre_materia']
-                    },{
-                        association: 'Curso',
-                        attributes:['anio_curso','division_curso']
-                    }],
+                    attributes: ['idmateriacurso'],
+                    include: [
+                        {
+                            association: 'Materia',
+                            attributes: ['nombre_materia']
+                        },
+                        {
+                            association: 'Curso',
+                            attributes: ['anio_curso', 'division_curso', 'fk_idturno_curso'],
+                            include: [{
+                                association: 'Turno',
+                                attributes: ['nombre_turno']
+                            }]
+                        }
+                    ],
                     where: {
                         fk_iddocente_materiacurso: usuarioCookie.fk_iddocente_usuario
                     }
@@ -46,10 +53,11 @@ async function userLoggedMiddleware(req, res, next) {
                 let materias = [...new Set(materiacurso.map(mc => mc.dataValues.Materia.dataValues.nombre_materia))];
 
                 let cursos = materiacurso.map(docenteCurso => ({
+                    idmateriacurso: docenteCurso.dataValues.idmateriacurso,
                     nombre_materia: docenteCurso.dataValues.Materia.dataValues.nombre_materia,
                     anio_curso: docenteCurso.dataValues.Curso.dataValues.anio_curso,
                     division_curso: docenteCurso.dataValues.Curso.dataValues.division_curso,
-                    turno: docenteCurso.dataValues.turno_materiacurso
+                    nombre_turno: docenteCurso.dataValues.Curso.dataValues.Turno.dataValues.nombre_turno
                 }));
 
                 req.session.userLogged = {

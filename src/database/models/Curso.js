@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
         estado_curso: {
             type: DataTypes.INTEGER(1),
             allowNull : false
+        },
+        fk_idturno_curso: {
+            type: DataTypes.INTEGER(10).UNSIGNED,
+            defaultValue: null
         }
     }
     let config = {
@@ -30,6 +34,11 @@ module.exports = (sequelize, DataTypes) => {
         Curso.hasMany(models.Materia_Curso, {
             as : "Materias_Cursos",
             foreignKey : "fk_idcurso_materiacurso"
+        })
+
+        Curso.belongsTo(models.Turno, {
+            as: "Turno",
+            foreignKey: "fk_idturno_curso"
         })
         
     }

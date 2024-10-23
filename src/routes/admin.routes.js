@@ -35,7 +35,13 @@ router.post('/usuario/materia',adminControllers.crear_materia)
 
 //MODIFICAR
 // http://localhost:4000/administrador/usuario/modificar
-router.get('/usuario/modificar',adminControllers.modificarUser)
+router.get('/usuario/modificar',adminControllers.modificar)
+
+// http://localhost:4000/administrador/usuario/modificar/tabla
+router.post('/usuario/modificar/tabla',adminControllers.modificarTabla)
+
+// http://localhost:4000/administrador/usuario/modificar/relacion
+router.post('/usuario/modificar/relacion',adminControllers.modificarRelacion)
 
 //Modificar individual
 // http://localhost:4000/administrador/usuario/modificar/:idusuario

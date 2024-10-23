@@ -87,31 +87,15 @@
 					<ul class="todo-list">
 						<% for(let index = 0; index < cursos.length; index++) { %>
 							<li class="not-completed">
-								<p><%= cursos[index].anio_curso %> <%= cursos[index].division_curso %></p>
+								<p><%= cursos[index].anio_curso %></p>
 								<i class='bx bx-dots-vertical-rounded'>
-									<input type="checkbox" name="cursos" value="<%= cursos[index].idcurso %>">
+									<input type="checkbox" name="cursos" value="<%= cursos[index].anio_curso %>">
 								</i>
 							</li>
 						<% } %>
 					</ul>
 				</div>
-				<div class="todo">
-					<div class="head">
-						<h3>Turno</h3>
-						<i class='bx bx-plus' ></i>
-						<i class='bx bx-filter' ></i>
-					</div>
-					<ul class="todo-list">
-						<% for(let index = 0; index < turnos.length; index++) { %>
-							<li class="not-completed">
-								<p><%= turnos[index].turno_materiacurso %></p>
-								<i class='bx bx-dots-vertical-rounded'>
-									<input type="checkbox" name="turnos" value="<%= turnos[index].turno_materiacurso %>">
-								</i>
-							</li>
-						<% } %>
-					</ul>
-				</div>
+
 			</div>
 			<button type="submit">Asignar</button>
 		</form>

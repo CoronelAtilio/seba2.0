@@ -58,18 +58,26 @@ module.exports = {
     
             // Buscar materias y cursos del docente
             const materiacurso = await db.Materia_Curso.findAll({
-                attributes: ['idmateriacurso','turno_materiacurso'],
-                include: [{
-                    association: 'Materia',
-                    attributes: ['nombre_materia']
-                },{
-                    association: 'Curso',
-                    attributes:['anio_curso','division_curso']
-                }],
+                attributes: ['idmateriacurso'],
+                include: [
+                    {
+                        association: 'Materia',
+                        attributes: ['nombre_materia']
+                    },
+                    {
+                        association: 'Curso',
+                        attributes: ['anio_curso', 'division_curso', 'fk_idturno_curso'],
+                        include: [{
+                            association: 'Turno',
+                            attributes: ['nombre_turno']
+                        }]
+                    }
+                ],
                 where: {
                     fk_iddocente_materiacurso: user.fk_iddocente_usuario
                 }
             });
+            
     
             let materias = [...new Set(materiacurso.map(mc => mc.dataValues.Materia.dataValues.nombre_materia))];
     
@@ -78,7 +86,7 @@ module.exports = {
                 nombre_materia: docenteCurso.dataValues.Materia.dataValues.nombre_materia,
                 anio_curso: docenteCurso.dataValues.Curso.dataValues.anio_curso,
                 division_curso: docenteCurso.dataValues.Curso.dataValues.division_curso,
-                turno: docenteCurso.dataValues.turno_materiacurso
+                nombre_turno: docenteCurso.dataValues.Curso.dataValues.Turno.dataValues.nombre_turno
             }));
     
             // Configuración de la sesión
@@ -88,7 +96,7 @@ module.exports = {
                 materias,
                 cursos
             };
-            console.log(req.session.userLogged);
+                           
             
             return res.redirect('/welcome');
     

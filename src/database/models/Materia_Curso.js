@@ -28,10 +28,6 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
             defaultValue: null
         },
-        turno_materiacurso: {
-            type: DataTypes.STRING(15),
-            allowNull: false,
-        },
         estado_materiacurso: {
             type: DataTypes.INTEGER(1),
             allowNull: false
@@ -39,7 +35,13 @@ module.exports = (sequelize, DataTypes) => {
     }
     let config = {
         tableName: "materias_cursos",
-        timestamps: true
+        timestamps: true,
+        indexes: [
+            {
+                unique: true,
+                fields: ['fk_idcurso_materiacurso', 'fk_idmateria_materiacurso']
+            }
+        ]
     }
     const Materia_Curso = sequelize.define(alias, cols, config)
 
