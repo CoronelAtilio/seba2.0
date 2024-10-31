@@ -16,4 +16,10 @@ document.addEventListener("DOMContentLoaded", function() {
             });
         });
     });
+
+    // Mostrar el formulario activo en caso de errores
+    const activeForm = "<%= typeof activeForm !== 'undefined' ? activeForm : '' %>";
+    if (activeForm) {
+        document.getElementById(activeForm).style.display = "block";
+    }
 });

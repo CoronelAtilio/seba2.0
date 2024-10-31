@@ -25,57 +25,66 @@
                                     <select name="tabla" class="btn-download" required
                                         id="cursoSelect">
                                         <option disabled selected>Selecciona Tabla</option>
-                                            <option value="alumnos"> Alumnos </option>
-                                            <option value="docentes"> Docentes</option>
-                                            <option value="usuarios"> Usuarios</option>
-                                            <option value="tutores"> Tutores</option>
-                                            <option value="cursos"> Cursos</option>
-                                            <option value="materias"> Materias</option>
+                                            <option value="Alumno"> Alumnos </option>
+                                            <option value="Docente"> Docentes</option>
+                                            <option value="Usuario"> Usuarios</option>
+                                            <option value="Tutor"> Tutores</option>
+                                            <option value="Curso"> Cursos</option>
+                                            <option value="Materia"> Materias</option>
                                     </select>
                                 </div>
                             </span>
 
                         </form>
 
-                        <form id="relaciones" action="/administrador/usuario/modificar/relacion" method="POST">
-                            <span class="text">
-                                <div class="input-field">
-                                    <select name="relacion" class="btn-download" required
-                                        id="divisionSelect">
-                                        <option disabled selected>Selecciona Relacion</option>
-                                            <option value="materias_cursos"> Curso y Materia</option>
-                                            <option value="docentes_materias_cursos"> Docente y Materia_Curso</option>
-                                            <option value="alumnos_cursos"> Alumno y Curso</option>
-                                    </select>
-                                </div>
-                            </span>
-
-                        </form>
 
                     </div>
 
                     <div class="table-data">
                         <div class="order">
-                            <form action="#" method="POST">
+                            
                                 <table id="example" class="display" style="width:100%">
                                     <thead>
                                         <tr>
-                                            <% for(let index = 0; index < data.length; index++) { %>
+                                            <% for(let index = 0; index < data.length-1; index++) { %>
                                                 <th><%= data[index] %></th>
                                             <% } %>
+                                            <th>Modificar</th>
+                                            <th>Baja</th> 
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <% for(let i = 0; i < dataSelected.length; i++) { %>
+                                            <% 
+                                                // Obtén el primer y último valor de dataSelected[i]
+                                                const firstValue = Object.values(dataSelected[i])[0];
+                                                const lastValue = Object.values(dataSelected[i])[Object.values(dataSelected[i]).length - 1];
+                                            %>
                                             <tr>
-                                                <% for(let j = 0; j < data.length; j++) { %>
-                                                    <td>
-                                                        <%= dataSelected[i][data[j]] %> 
-                                                    </td>
+                                                <% for(let j = 0; j < data.length - 1; j++) { %>
+                                                    <td><%= dataSelected[i][data[j]] %></td>
                                                 <% } %>
+                                                
+                                                <!-- Botón de modificación -->
+                                                <td>
+                                                    <form action="/administrador/usuario/modificar/<%= Object.keys(dataSelected[0])[0] %>/<%= firstValue %>" method="get">
+                                                        <button class="btn-modify btn-modify-modify" id="btn-modify-modify" type="submit">
+                                                            <i class="bx bx-pencil"></i> 
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                                
+                                                <!-- Toggle button con lógica de data-id y data-estado consistentes -->
+                                                <td>
+                                                    <div class="toggle-btn-delete <%= lastValue === 1 ? 'active-delete' : '' %>" data-id="<%= firstValue %>" data-estado="<%= lastValue %>">
+                                                        <div class="inner-circle-delete"></div>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         <% } %>
+                                        
                                     </tbody>
+                                    
                                 
                                     <tfoot>
                                         <tr>
@@ -87,7 +96,7 @@
                                 </table>
                                 
                                 <button type="submit">Enviar</button>
-                            </form>
+                            
                         </div>
                     </div>
                 </main>

@@ -1,0 +1,2 @@
+ALTER TABLE `notas`
+ADD CONSTRAINT alumno_materiacurso UNIQUE (`fk_idalumno_nota`, `fk_idmateriacurso_nota`);

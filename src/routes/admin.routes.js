@@ -40,8 +40,6 @@ router.get('/usuario/modificar',adminControllers.modificar)
 // http://localhost:4000/administrador/usuario/modificar/tabla
 router.post('/usuario/modificar/tabla',adminControllers.modificarTabla)
 
-// http://localhost:4000/administrador/usuario/modificar/relacion
-router.post('/usuario/modificar/relacion',adminControllers.modificarRelacion)
 
 //Modificar individual
 // http://localhost:4000/administrador/usuario/modificar/:idusuario
@@ -50,8 +48,8 @@ router.get('/usuario/modificar/:idusuario',adminControllers.modificarUserOne)
 // http://localhost:4000/administrador/usuario/modificar/docente/:idprofesor
 router.get('/usuario/modificar/docente/:idprofesor',adminControllers.modificarDocenteOne)
 
-// http://localhost:4000/administrador/usuario/modificar/alumno/:idalumno
-router.get('/usuario/modificar/alumno/:idalumno',adminControllers.modificarAlumnoOne)
+// http://localhost:4000/administrador/usuario/modificar/dni_alumno/:idalumno
+router.get('/usuario/modificar/dni_alumno/:dni_alumno',adminControllers.modificarAlumnoOne)
 
 
 //Eliminar

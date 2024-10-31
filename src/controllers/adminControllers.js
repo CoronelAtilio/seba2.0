@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
 
+
 module.exports = {
     admin: (req, res) => {
         res.render('admin/usuario')
@@ -40,6 +41,7 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors1: errorsObj,
                     old1: req.body,
+                    activeForm: 'form1' // ID del formulario a mostrar
                 });
             }
 
@@ -57,6 +59,7 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors1: errorsObj,
                     old1: req.body,
+                    activeForm: 'form1'
                 });
             }
             await db.Usuario.create({
@@ -82,6 +85,7 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors2: errors.mapped(),
                     old2: req.body,
+                    activeForm: 'form2'
                 });
             }
 
@@ -117,6 +121,7 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors2: errorsObj,
                     old2: req.body,
+                    activeForm: 'form2'
                 });
             }
 
@@ -133,6 +138,7 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors2: errorsObj,
                     old2: req.body,
+                    activeForm: 'form2'
                 });
             }
 
@@ -141,6 +147,7 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors2: errorsObj,
                     old2: req.body,
+                    activeForm: 'form2'
                 });
             }
 
@@ -166,128 +173,143 @@ module.exports = {
         }
     },
     crear_alu_tut: async (req, res) => {
+
+        const actionType = req.body.actionType;
+
+        if (actionType === 'crear') {
+            // Lógica para crear el alumno
+            try {
+                // Validar errores en la solicitud
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.render('admin/usuario', {
+                        errors3: errors.mapped(),
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+    
+                let {
+                    apellido_alumno, nombre_alumno, fecha_nac_alumno, email_alumno,
+                    celular_alumno, direccion_alumno, dni_alumno, genero_alumno,
+                    apellido_tutor, nombre_tutor, email_tutor,
+                    celular_tutor, direccion_tutor, dni_tutor
+                } = req.body;
+    
+                email_alumno = email_alumno.toLowerCase();
+                email_tutor = email_tutor.toLowerCase();
+    
+                let errorsObj = {};
+    
+                // Buscar alumno existente
+                const alumno = await db.Alumno.findOne({
+                    attributes: ['dni_alumno', 'email_alumno', 'celular_alumno'],
+                    where: {
+                        [Op.or]: [
+                            { dni_alumno: dni_alumno },
+                            { email_alumno: email_alumno },
+                            { celular_alumno: celular_alumno }
+                        ]
+                    }
+                });
+    
+                if (alumno) {
+                    if (alumno.dni_alumno === dni_alumno) {
+                        errorsObj.dni_alumno = { msg: 'Este DNI ya existe' };
+                    }
+                    if (alumno.email_alumno === email_alumno) {
+                        errorsObj.email_alumno = { msg: 'Este Email ya Existe' };
+                    }
+                    if (alumno.celular_alumno === celular_alumno) {
+                        errorsObj.celular_alumno = { msg: 'Este Celular ya Existe' };
+                    }
+                }
+    
+                if (Object.keys(errorsObj).length > 0) {
+                    return res.render('admin/usuario', {
+                        errors3: errorsObj,
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+    
+                const genero = await db.Genero.findOne({
+                    where: { nombre_genero: genero_alumno }
+                });
+    
+                if (!genero) {
+                    errorsObj.genero_alumno = { msg: 'Género no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors3: errorsObj,
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+    
+                let idNuevoTutor = null;
+    
+                // Crear tutor solo si se proporciona un DNI válido
+                if (dni_tutor && dni_tutor.trim() !== "") {
+                    let tutor = await db.Tutor.findOne({ where: { dni_tutor } });
+    
+                    if (!tutor) {
+                        const tutorTemp = await db.Tutor.create({
+                            apellido_tutor,
+                            nombre_tutor,
+                            email_tutor,
+                            celular_tutor,
+                            direccion_tutor,
+                            dni_tutor,
+                            estado_tutor: 1
+                        });
+                        idNuevoTutor = tutorTemp.idtutor;
+                    } else {
+                        idNuevoTutor = tutor.idtutor;
+                    }
+                }
+    
+                // Crear alumno
+                await db.Alumno.create({
+                    apellido_alumno,
+                    nombre_alumno,
+                    fecha_nac_alumno,
+                    email_alumno,
+                    celular_alumno,
+                    direccion_alumno,
+                    dni_alumno,
+                    fk_idgenero_alumno: genero.idgenero,
+                    fk_idtutor_alumno: idNuevoTutor, // Puede ser null si no hay tutor
+                    estado_alumno: 1
+                });
+    
+                res.redirect('/administrador/usuario');
+            } catch (error) {
+                console.error("Error al crear el alumno y tutor:", error);
+                res.status(500).send('Ocurrió un error al crear el alumno y tutor.');
+            }
+        } else if (actionType === 'modificar') {
+            // Lógica para modificar el alumno
+        }
+
+       
+    },
+    crear_curso: async (req, res) => {
         try {
             // Validar errores en la solicitud
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return res.render('admin/usuario', {
-                    errors3: errors.mapped(),
-                    old3: req.body,
-                });
-            }
-    
-            let {
-                apellido_alumno, nombre_alumno, fecha_nac_alumno, email_alumno,
-                celular_alumno, direccion_alumno, dni_alumno, genero_alumno,
-                apellido_tutor, nombre_tutor, email_tutor,
-                celular_tutor, direccion_tutor, dni_tutor
-            } = req.body;
-
-            email_alumno = email_alumno.toLowerCase();
-            email_tutor = email_tutor.toLowerCase();
-    
-            let errorsObj = {};
-    
-            // Buscar alumno existente
-            const alumno = await db.Alumno.findOne({
-                attributes: ['dni_alumno', 'email_alumno', 'celular_alumno'],
-                where: {
-                    [Op.or]: [
-                        { dni_alumno: dni_alumno },
-                        { email_alumno: email_alumno },
-                        { celular_alumno: celular_alumno }
-                    ]
-                }
-            });
-    
-            if (alumno) {
-                if (alumno.dni_alumno === dni_alumno) {
-                    errorsObj.dni_alumno = { msg: 'Este DNI ya existe' };
-                }
-                if (alumno.email_alumno === email_alumno) {
-                    errorsObj.email_alumno = { msg: 'Este Email ya Existe' };
-                }
-                if (alumno.celular_alumno === celular_alumno) {
-                    errorsObj.celular_alumno = { msg: 'Este Celular ya Existe' };
-                }
-            }
-    
-            if (Object.keys(errorsObj).length > 0) {
-                return res.render('admin/usuario', {
-                    errors3: errorsObj,
-                    old3: req.body,
-                });
-            }
-    
-            const genero = await db.Genero.findOne({
-                where: { nombre_genero: genero_alumno }
-            });
-    
-            if (!genero) {
-                errorsObj.genero_alumno = { msg: 'Género no encontrado' };
-                return res.render('admin/usuario', {
-                    errors3: errorsObj,
-                    old3: req.body,
-                });
-            }
-    
-            let idNuevoTutor = null;
-    
-            // Crear tutor solo si se proporciona un DNI válido
-            if (dni_tutor && dni_tutor.trim() !== "") {
-                let tutor = await db.Tutor.findOne({ where: { dni_tutor } });
-    
-                if (!tutor) {
-                    const tutorTemp = await db.Tutor.create({
-                        apellido_tutor,
-                        nombre_tutor,
-                        email_tutor,
-                        celular_tutor,
-                        direccion_tutor,
-                        dni_tutor
-                    });
-                    idNuevoTutor = tutorTemp.idtutor;
-                } else {
-                    idNuevoTutor = tutor.idtutor;
-                }
-            }
-    
-            // Crear alumno
-            await db.Alumno.create({
-                apellido_alumno,
-                nombre_alumno,
-                fecha_nac_alumno,
-                email_alumno,
-                celular_alumno,
-                direccion_alumno,
-                dni_alumno,
-                fk_idgenero_alumno: genero.idgenero,
-                fk_idtutor_alumno: idNuevoTutor, // Puede ser null si no hay tutor
-                estado_alumno: 1
-            });
-    
-            res.redirect('/administrador/usuario');
-        } catch (error) {
-            console.error("Error al crear el alumno y tutor:", error);
-            res.status(500).send('Ocurrió un error al crear el alumno y tutor.');
-        }
-    },
-    crear_curso: async (req,res)=>{
-        try {
-              // Validar errores en la solicitud
             //   const errors = validationResult(req);
             //   if (!errors.isEmpty()) {
             //       return res.render('admin/usuario', {
             //           errors3: errors.mapped(),
             //           old3: req.body,
+            // activeForm: 'form3'
             //       });
             //   }
 
             let errorsObj = {};
-            let {anio_curso,division_curso} = req.body;
-            anio_curso=anio_curso.toLowerCase()
-            division_curso=division_curso.toUpperCase()
-            
+            let { anio_curso, division_curso } = req.body;
+            anio_curso = anio_curso.toLowerCase()
+            division_curso = division_curso.toUpperCase()
+
             const cursoExistente = await db.Curso.findOne({
                 where: {
                     anio_curso: anio_curso,
@@ -299,8 +321,9 @@ module.exports = {
                 return res.render('admin/usuario', {
                     errors4: errorsObj,
                     old4: req.body,
+                    activeForm: 'form4'
                 });
-                 
+
             } else {
 
                 await db.Curso.create({
@@ -311,129 +334,262 @@ module.exports = {
 
                 return res.redirect('/administrador/usuario');
             }
-            
-            } catch (error) {
-                console.error("Error al crear el curso:", error);
-                res.status(500).send('Ocurrió un error al crear el curso.');
-            }
+
+        } catch (error) {
+            console.error("Error al crear el curso:", error);
+            res.status(500).send('Ocurrió un error al crear el curso.');
+        }
     },
-    crear_materia: async (req,res)=>{
+    crear_materia: async (req, res) => {
         try {
             // Validar errores en la solicitud
-          //   const errors = validationResult(req);
-          //   if (!errors.isEmpty()) {
-          //       return res.render('admin/usuario', {
-          //           errors3: errors.mapped(),
-          //           old3: req.body,
-          //       });
-          //   }
+            //   const errors = validationResult(req);
+            //   if (!errors.isEmpty()) {
+            //       return res.render('admin/usuario', {
+            //           errors3: errors.mapped(),
+            //           old3: req.body,
+            // activeForm: 'form3'
+            //       });
+            //   }
 
-          let errorsObj = {};
-          //limpieza de materia
-          const removeAccents = (str) => {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          }
-          
-          let { nombre_materia } = req.body;
-          nombre_materia = nombre_materia.toLowerCase();
-          nombre_materia = removeAccents(nombre_materia); // Quitar acentos
-          nombre_materia = nombre_materia.trim(); // Quitar espacios al principio y al final
-
-          
-          const materiaExistente = await db.Materia.findOne({
-              where: {
-                  nombre_materia:nombre_materia
-              }
-          });
-          if (materiaExistente) {
-              errorsObj.nombre_materia = { msg: 'Materia existente, prueba otro nombre' };
-              return res.render('admin/usuario', {
-                  errors5: errorsObj,
-                  old5: req.body,
-              });
-               
-          } else {
-
-              await db.Materia.create({
-                  nombre_materia:nombre_materia,
-                  estado_materia: 1
-              });
-
-              return res.redirect('/administrador/usuario');
+            let errorsObj = {};
+            //limpieza de materia
+            const removeAccents = (str) => {
+                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
             }
-          } catch (error) {
-              console.error("Error al crear la materia:", error);
-              res.status(500).send('Ocurrió un error al crear la materia.');
-          }
+
+            let { nombre_materia } = req.body;
+            nombre_materia = nombre_materia.toLowerCase();
+            nombre_materia = removeAccents(nombre_materia); // Quitar acentos
+            nombre_materia = nombre_materia.trim(); // Quitar espacios al principio y al final
+
+
+            const materiaExistente = await db.Materia.findOne({
+                where: {
+                    nombre_materia: nombre_materia
+                }
+            });
+            if (materiaExistente) {
+                errorsObj.nombre_materia = { msg: 'Materia existente, prueba otro nombre' };
+                return res.render('admin/usuario', {
+                    errors5: errorsObj,
+                    old5: req.body,
+                    activeForm: 'form5'
+                });
+
+            } else {
+
+                await db.Materia.create({
+                    nombre_materia: nombre_materia,
+                    estado_materia: 1
+                });
+
+                return res.redirect('/administrador/usuario');
+            }
+        } catch (error) {
+            console.error("Error al crear la materia:", error);
+            res.status(500).send('Ocurrió un error al crear la materia.');
+        }
     },
     modificar: async (req, res) => {
         try {
             let data = [];
             let dataSelected = [];
-    
-            if (req.session && req.session.dataSelected) {
-                dataSelected = req.session.dataSelected;
-                delete req.session.dataSelected;
-    
-                // Obtener los keys del primer objeto y almacenarlos en un array (atributos)
-                data = Object.keys(dataSelected[0]);
-    
-                console.log(data);
-                
-                // Aquí dataSelected sigue siendo el array original de objetos
-                return res.render('admin/modificar/modificar', { data, dataSelected });
-            }
-    
+
             res.render('admin/modificar/modificar', { data, dataSelected });
         } catch (error) {
             console.error("Error modificar:", error);
             res.status(500).send('Ocurrió un error.');
         }
     },
-    
     modificarTabla: async (req, res) => {
         try {
-            //llega variable alumnos
-            const data = await db.Alumno.findAll({
-                include: [
-                    {
-                        model: db.Genero,
-                        as: 'Genero',
-                        attributes: ['nombre_genero'] 
-                    }
-                ],
-                attributes: {
-                    exclude: ['fk_idgenero_alumno'] 
-                }
-            });
 
-            const dataSelected = data.map(alumno => ({
-                dni: alumno.dataValues.dni_alumno,
-                Email: alumno.dataValues.email_alumno,
-                Celular: alumno.dataValues.celular_alumno,
-                Apellido: alumno.dataValues.apellido_alumno,
-                Nombre: alumno.dataValues.nombre_alumno,
-                Direccion: alumno.dataValues.direccion_alumno,
-                Nacimiento: alumno.dataValues.fecha_nac_alumno,
-                Genero: alumno.dataValues.Genero.dataValues.nombre_genero 
-              }));
-              
-            req.session.dataSelected = dataSelected;
-            console.log(req.session.dataSelected);
-            
-            
+            let data = [];
+            let dataSelected = [];
+
+            if (req.body.tabla === "Alumno") {
+
+                //llega variable alumnos
+                let data = await db.Alumno.findAll({
+                    include: [
+                        {
+                            model: db.Genero,
+                            as: 'Genero',
+                            attributes: ['nombre_genero']
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['fk_idgenero_alumno']
+                    }
+                });
+
+                const dataSelected = data.map(alumno => ({
+                    dni_alumno: alumno.dataValues.dni_alumno,
+                    Email: alumno.dataValues.email_alumno,
+                    Celular: alumno.dataValues.celular_alumno,
+                    Apellido: alumno.dataValues.apellido_alumno,
+                    Nombre: alumno.dataValues.nombre_alumno,
+                    Direccion: alumno.dataValues.direccion_alumno,
+                    Nacimiento: alumno.dataValues.fecha_nac_alumno,
+                    Genero: alumno.dataValues.Genero.dataValues.nombre_genero,
+                    Estado: alumno.dataValues.estado_alumno
+                }));
+
+                // Verificar que dataSelected no esté vacío antes de obtener las claves
+                if (dataSelected.length > 0) {
+                    data = Object.keys(dataSelected[0]);
+                } else {
+                    data = []; // Si dataSelected está vacío, data también estará vacío
+                }
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+            } else if (req.body.tabla === "Docente") {
+                let data = await db.Docente.findAll({
+                    include: [
+                        {
+                            model: db.Cargo,
+                            as: 'Cargo',
+                            attributes: ['nombre_cargo']
+                        },
+                        {
+                            model: db.Situacion,
+                            as: 'Situacion',
+                            attributes: ['nombre_situacion']
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['fk_idcargo_docente', 'fk_idsituacion_docente']
+                    }
+                });
+
+                const dataSelected = data.map(docente => ({
+                    dni_docente: docente.dataValues.dni_docente,
+                    Email: docente.dataValues.email_docente,
+                    Celular: docente.dataValues.celular_docente,
+                    Apellido: docente.dataValues.apellido_docente,
+                    Nombre: docente.dataValues.nombre_docente,
+                    Nacimiento: docente.dataValues.fecha_nac_docente,
+                    Cargo: docente.dataValues.Cargo.dataValues.nombre_cargo,
+                    Situacion: docente.dataValues.Situacion.dataValues.nombre_situacion,
+                    Estado: docente.dataValues.estado_docente
+                }));
+
+                // Verificar que dataSelected no esté vacío antes de obtener las claves
+                if (dataSelected.length > 0) {
+                    data = Object.keys(dataSelected[0]);
+                } else {
+                    data = []; // Si dataSelected está vacío, data también estará vacío
+                }
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+
+
+            } else if (req.body.tabla === "Usuario") {
+                let data = await db.Usuario.findAll({
+                    include: [
+                        {
+                            model: db.Rol,
+                            as: 'Rol',
+                            attributes: ['nombre_rol']
+                        },
+                        {
+                            model: db.Docente,
+                            as: 'Docente',
+                            attributes: ['nombre_docente', 'apellido_docente']
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['fk_idrol_usuario', 'fk_iddocente_usuario']
+                    }
+                });
+
+                const dataSelected = data.map(usuario => ({
+                    Usuario: usuario.dataValues.nombre_usuario,
+                    Apellido: usuario.dataValues.Docente.dataValues.apellido_docente,
+                    Nombre: usuario.dataValues.Docente.dataValues.nombre_docente,
+                    Rol: usuario.dataValues.Rol.dataValues.nombre_rol,
+                    Estado: usuario.dataValues.estado_usuario
+                }));
+
+                // Verificar que dataSelected no esté vacío antes de obtener las claves
+                if (dataSelected.length > 0) {
+                    data = Object.keys(dataSelected[0]);
+                } else {
+                    data = []; // Si dataSelected está vacío, data también estará vacío
+                }
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+
+
+            } else if (req.body.tabla === "Tutor") {
+                let data = await db.Tutor.findAll();
+
+                const dataSelected = data.map(tutor => ({
+                    dni_tutor: tutor.dataValues.dni_tutor,
+                    Email: tutor.dataValues.email_tutor,
+                    Celular: tutor.dataValues.celular_tutor,
+                    Apellido: tutor.dataValues.apellido_tutor,
+                    Nombre: tutor.dataValues.nombre_tutor,
+                    Direccion: tutor.dataValues.direccion_tutor,
+                    Estado: tutor.dataValues.estado_tutor
+                }));
+
+                // Verificar que dataSelected no esté vacío antes de obtener las claves
+                if (dataSelected.length > 0) {
+                    data = Object.keys(dataSelected[0]);
+                } else {
+                    data = []; // Si dataSelected está vacío, data también estará vacío
+                }
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+
+            } else if (req.body.tabla === "Curso") {
+                let data = await db.Curso.findAll({
+                    include: [
+                        {
+                            model: db.Turno,
+                            as: 'Turno',
+                            attributes: ['nombre_turno']
+                        }
+                    ],
+                    attributes: {
+                        exclude: ['fk_idturno_curso']
+                    }
+                });
+
+                const dataSelected = data.map(curso => ({
+                    idcurso: curso.dataValues.idcurso,
+                    año: curso.dataValues.anio_curso,
+                    division: curso.dataValues.division_curso,
+                    turno: curso.dataValues.Turno.dataValues.nombre_turno,
+                    Estado: curso.dataValues.estado_curso
+                }));
+
+                // Verificar que dataSelected no esté vacío antes de obtener las claves
+                if (dataSelected.length > 0) {
+                    data = Object.keys(dataSelected[0]);
+                } else {
+                    data = []; // Si dataSelected está vacío, data también estará vacío
+                }
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+
+            } else if (req.body.tabla === "Materia") {
+                let data = await db.Materia.findAll();
+
+                const dataSelected = data.map(materia => ({
+                    idmateria: materia.dataValues.idmateria,
+                    Materia: materia.dataValues.nombre_materia,
+                    Estado: materia.dataValues.estado_materia
+                }));
+
+                // Verificar que dataSelected no esté vacío antes de obtener las claves
+                if (dataSelected.length > 0) {
+                    data = Object.keys(dataSelected[0]);
+                } else {
+                    data = []; // Si dataSelected está vacío, data también estará vacío
+                }
+                return res.render('admin/modificar/modificar', { data, dataSelected });
+
+            }
+
             res.redirect('/administrador/usuario/modificar')
-        } catch (error) {
-            console.error("Error modificar:", error);
-            res.status(500).send('Ocurrió un error.');
-        }
-    },
-    modificarRelacion: async (req, res) => {
-        try {
-            let alumnos = await db.Alumno.findAll()
-            let docentes = await db.Docente.findAll()
-            let usuarios = await db.Usuario.findAll()
-            res.render('admin/modificar/modificar', { alumnos, docentes, usuarios })
         } catch (error) {
             console.error("Error modificar:", error);
             res.status(500).send('Ocurrió un error.');
@@ -484,27 +640,46 @@ module.exports = {
     },
     eliminarAlumno: async (req, res) => {
         try {
-            let idalumno = req.params.idalumno
-            // Busca el registro del docente
-            let alumno = await db.Alumno.findByPk(idalumno);
+            let { dni, estado } = req.body
+            let alumno = await db.Alumno.findOne({
+                where: {
+                    "dni_alumno": dni
+                }
+            })
 
             if (alumno) {
-                // // Elimina todas las referencias en la tabla docentees_materias
-                // await db.docente_Materia.destroy({
-                //     where: { fk_iddocente_docentemateria: iddocente }
-                // });
-
-                // // Elimina todas las referencias en la tabla usuarios
-                // await db.Usuario.destroy({
-                //     where: { fk_iddocente_usuario: iddocente }
-                // });
-
-                // Elimina el alumno
-                await db.Alumno.destroy({
-                    where: { idalumno }
-                });
+                await db.Alumno.update(
+                    { "estado_alumno": estado }, // Datos a actualizar
+                    {
+                        where: { dni_alumno: dni }  // Condición de búsqueda
+                    }
+                );
 
             }
+
+            console.log(req.body);
+
+
+            // Busca el registro del docente
+            // let alumno = await db.Alumno.findByPk(idalumno);
+
+            // if (alumno) {
+            // // Elimina todas las referencias en la tabla docentees_materias
+            // await db.docente_Materia.destroy({
+            //     where: { fk_iddocente_docentemateria: iddocente }
+            // });
+
+            // // Elimina todas las referencias en la tabla usuarios
+            // await db.Usuario.destroy({
+            //     where: { fk_iddocente_usuario: iddocente }
+            // });
+
+            // Elimina el alumno
+            // await db.Alumno.destroy({
+            //     where: { idalumno }
+            // });
+
+            // }
             res.redirect('/administrador/usuario/modificar')
         } catch (error) {
             console.error("Error :", error);
@@ -535,10 +710,36 @@ module.exports = {
     },
     modificarAlumnoOne: async (req, res) => {
         try {
-            let idalumno = req.params.idalumno
-            let alumno = await db.Alumno.findByPk(idalumno)
+            let dni = req.params.dni_alumno
 
-            res.render('admin/modificar/modificarAlumno', { alumno })
+            let alumno = await db.Alumno.findOne({
+                include: [
+                    {
+                        model: db.Tutor,
+                        as: 'Tutor'
+                    },
+                    {
+                        model: db.Genero,
+                        as: 'Genero'
+                    }
+                ],
+                attributes: {
+                    exclude: ['fk_idtutor_alumno', 'fk_idgenero_alumno']
+                },
+                where: {
+                    "dni_alumno": dni
+                }
+            })
+            console.log(alumno);
+
+            if (alumno) {
+                return res.render('admin/usuario', {
+                    old3: alumno,
+                    activeForm: 'form3'
+                });
+            }
+
+            res.redirect('/administrador/usuario')
         } catch (error) {
             console.error("Error modificar:", error);
             res.status(500).send('Ocurrió un error.');

@@ -39,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.DATE,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
             defaultValue : null
+        },
+        estado_tutor: {
+            type: DataTypes.INTEGER(1),
+            allowNull : false
         }
     }
     let config = {

@@ -201,8 +201,8 @@
                             </form>
 
                             <!-- Formulario 3 -->
-                            <form id="form3" class="form-content" style="display:none;"
-                                action="/administrador/usuario/alumno" method="post">
+                            <form id="form3" class="form-content" style="display:none;" action="/administrador/usuario/alumno" method="post">
+                                <input type="hidden" name="actionType" id="actionType" value="">
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Alumno</span>
@@ -280,17 +280,15 @@
                                                                 </div>
                                                                 <% } %>
 
-                                                                    <div class="input-field">
-                                                                        <label for="genero_alumno">Género</label>
-                                                                        <select name="genero_alumno" required>
-                                                                            <option disabled selected>Selecciona
-                                                                                Situación
-                                                                            </option>
-                                                                            <option value="masculino">Masculino</option>
-                                                                            <option value="femenino">Femenino</option>
-                                                                            <option value="otro">Otro</option>
-                                                                        </select>
-                                                                    </div>
+                                                                <div class="input-field">
+                                                                    <label for="genero_alumno">Género</label>
+                                                                    <select name="genero_alumno" required>
+                                                                        <option disabled <%= !(locals.old3 && locals.old3.Genero && locals.old3.Genero.nombre_genero) ? 'selected' : '' %>>Selecciona Género</option>
+                                                                        <option value="masculino" <%= (locals.old3 && locals.old3.Genero && locals.old3.Genero.nombre_genero === 'masculino') ? 'selected' : '' %>>Masculino</option>
+                                                                        <option value="femenino" <%= (locals.old3 && locals.old3.Genero && locals.old3.Genero.nombre_genero === 'femenino') ? 'selected' : '' %>>Femenino</option>
+                                                                        <option value="otro" <%= (locals.old3 && locals.old3.Genero && locals.old3.Genero.nombre_genero === 'otro') ? 'selected' : '' %>>Otro</option>
+                                                                    </select>
+                                                                </div>
                                         </div>
                                     </div>
                                     <div class="details personal">
@@ -356,12 +354,16 @@
                                                                 <% } %>
                                         </div>
                                     </div>
-                                    <button class="nextBtn" type="submit">
-                                        <span class="btnText">Enviar</span>
+                                    <button type="submit" onclick="setActionType('crear')" class="nextBtn">
+                                        <span class="btnText">Crear</span>
                                         <i class='bx bx-send'></i>
                                     </button>
-                                </div>
-                            </form>
+                                    
+                                    <button type="submit" onclick="setActionType('modificar')" class="nextBtn">
+                                        <span class="btnText">Modificar</span>
+                                        <i class='bx bx-edit'></i>
+                                    </button>
+                                </form>
 
                             <!-- Formulario 4 -->
                             <form id="form4" class="form-content" style="display:none;" action="/administrador/usuario/curso"
@@ -445,6 +447,21 @@
             <script src="/js/administrador_general/all_menues.js"></script>
             <!-- Script para mejorar la respuesta con "hide" -->
             <script src="/js/main_menues/usuario.js"></script>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const activeForm = "<%= typeof activeForm !== 'undefined' ? activeForm : '' %>";
+                    if (activeForm) {
+                        document.getElementById(activeForm).style.display = "block";
+                    }
+                });
+            </script>
+            <script>
+                function setActionType(type) {
+                    document.getElementById("actionType").value = type;
+                }
+                </script>
+                
+            
     </body>
 
 </html>

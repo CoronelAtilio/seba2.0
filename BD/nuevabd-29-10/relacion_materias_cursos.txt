@@ -1,0 +1,45 @@
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `relacion_materias_cursos`(    
+    IN materias JSON,
+    IN cursos JSON,
+    OUT valoresError JSON
+)
+BEGIN
+    DECLARE materia INT;
+    DECLARE curso INT;
+    DECLARE i INT DEFAULT 0;
+    DECLARE j INT DEFAULT 0;
+    DECLARE existeCombinacion BOOLEAN;
+
+    SET valoresError = JSON_ARRAY();
+
+    -- Bucles para recorrer todas las combinaciones
+    WHILE i < JSON_LENGTH(materias) DO
+        SET materia = JSON_UNQUOTE(JSON_EXTRACT(materias, CONCAT('$[', i, ']')));
+        SET j = 0;
+
+        WHILE j < JSON_LENGTH(cursos) DO
+            SET curso = JSON_UNQUOTE(JSON_EXTRACT(cursos, CONCAT('$[', j, ']')));
+
+            -- Verificar si la combinación existe
+            SET existeCombinacion = EXISTS (
+                SELECT 1 FROM materias_cursos 
+                WHERE fk_idmateria_materiacurso = materia 
+                AND fk_idcurso_materiacurso = curso
+            );
+
+            IF existeCombinacion THEN
+                -- Agregar la combinación existente a la salida
+                SET valoresError = JSON_ARRAY_APPEND(valoresError, '$', JSON_OBJECT(
+                    'materia', materia,
+                    'curso', curso
+                ));
+            END IF;
+
+            SET j = j + 1;
+        END WHILE;
+
+        SET i = i + 1;
+    END WHILE;
+END$$
+DELIMITER ;
