@@ -20,6 +20,11 @@ document.addEventListener("DOMContentLoaded", function() {
     // Mostrar el formulario activo en caso de errores
     const activeForm = "<%= typeof activeForm !== 'undefined' ? activeForm : '' %>";
     if (activeForm) {
-        document.getElementById(activeForm).style.display = "block";
+        const formElement = document.getElementById(activeForm);
+        if (formElement) {  // Verifica si el elemento existe
+            formElement.style.display = "block";
+        } else {
+            console.warn(`Elemento con id "${activeForm}" no encontrado.`);
+        }
     }
 });

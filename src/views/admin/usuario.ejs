@@ -296,64 +296,61 @@
                                         <div class="fields">
                                             <div class="input-field">
                                                 <label for="apellido_tutor">Apellido/s</label>
-                                                <input name="apellido_tutor" type="text"
-                                                    placeholder="Ingresa tu/s apellido/s"
-                                                    value="<%= locals.old3 && old3.apellido_tutor ? old3.apellido_tutor : '' %>">
+                                                <input name="apellido_tutor" type="text" placeholder="Ingresa tu/s apellido/s"
+                                                       value="<%= locals.old3 && locals.old3.Tutor ? locals.old3.Tutor.dataValues.apellido_tutor : '' %>">
                                             </div>
+                                    
                                             <div class="input-field">
                                                 <label for="nombre_tutor">Nombre/s</label>
-                                                <input name="nombre_tutor" type="text"
-                                                    placeholder="Ingresa tu/s nombre/s"
-                                                    value="<%= locals.old3 && old3.nombre_tutor ? old3.nombre_tutor : '' %>">
+                                                <input name="nombre_tutor" type="text" placeholder="Ingresa tu/s nombre/s"
+                                                       value="<%= locals.old3 && locals.old3.Tutor ? locals.old3.Tutor.dataValues.nombre_tutor : '' %>">
                                             </div>
+                                    
                                             <div class="input-field">
                                                 <label for="email_tutor">Email</label>
                                                 <input name="email_tutor" type="text" placeholder="algo@algo.com"
-                                                    value="<%= locals.old3 && old3.email_tutor ? old3.email_tutor : '' %>">
+                                                       value="<%= locals.old3 && locals.old3.Tutor ? locals.old3.Tutor.dataValues.email_tutor : '' %>">
                                             </div>
-
-                                            <!--comentario para los errores-->
+                                    
                                             <% if (locals.errors3 && locals.errors3.email_tutor) { %>
                                                 <div style="color: red;">
                                                     <%= locals.errors3.email_tutor.msg %>
                                                 </div>
-                                                <% } %>
-
-                                                    <div class="input-field">
-                                                        <label for="celular_tutor">Celular</label>
-                                                        <input name="celular_tutor" type="text" placeholder="3855234345"
-                                                            value="<%= locals.old3 && old3.celular_tutor ? old3.celular_tutor : '' %>">
-                                                    </div>
-
-                                                    <!--comentario para los errores-->
-                                                    <% if (locals.errors3 && locals.errors3.celular_tutor) { %>
-                                                        <div style="color: red;">
-                                                            <%= locals.errors3.celular_tutor.msg %>
-                                                        </div>
-                                                        <% } %>
-
-
-                                                            <div class="input-field">
-                                                                <label for="direccion_tutor">Dirección/es</label>
-                                                                <input name="direccion_tutor" type="text"
-                                                                    placeholder="Ingresa tu/s dirección/nes"
-                                                                    value="<%= locals.old3 && old3.direccion_tutor ? old3.direccion_tutor : '' %>">
-                                                            </div>
-                                                            <div class="input-field">
-                                                                <label for="dni_tutor">DNI</label>
-                                                                <input name="dni_tutor" type="text"
-                                                                    placeholder="34094325"
-                                                                    value="<%= locals.old3 && old3.dni_tutor ? old3.dni_tutor : '' %>">
-                                                            </div>
-
-                                                            <!--comentario para los errores-->
-                                                            <% if (locals.errors3 && locals.errors3.dni_tutor) { %>
-                                                                <div style="color: red;">
-                                                                    <%= locals.errors3.dni_tutor.msg %>
-                                                                </div>
-                                                                <% } %>
+                                            <% } %>
+                                    
+                                            <div class="input-field">
+                                                <label for="celular_tutor">Celular</label>
+                                                <input name="celular_tutor" type="text" placeholder="3855234345"
+                                                       value="<%= locals.old3 && locals.old3.Tutor ? locals.old3.Tutor.dataValues.celular_tutor : '' %>">
+                                            </div>
+                                    
+                                            <% if (locals.errors3 && locals.errors3.celular_tutor) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors3.celular_tutor.msg %>
+                                                </div>
+                                            <% } %>
+                                    
+                                            <div class="input-field">
+                                                <label for="direccion_tutor">Dirección/es</label>
+                                                <input name="direccion_tutor" type="text" placeholder="Ingresa tu/s dirección/nes"
+                                                       value="<%= locals.old3 && locals.old3.Tutor ? locals.old3.Tutor.dataValues.direccion_tutor : '' %>">
+                                            </div>
+                                    
+                                            <div class="input-field">
+                                                <label for="dni_tutor">DNI</label>
+                                                <input name="dni_tutor" type="text" placeholder="34094325"
+                                                       value="<%= locals.old3 && locals.old3.Tutor ? locals.old3.Tutor.dataValues.dni_tutor : '' %>">
+                                            </div>
+                                    
+                                            <% if (locals.errors3 && locals.errors3.dni_tutor) { %>
+                                                <div style="color: red;">
+                                                    <%= locals.errors3.dni_tutor.msg %>
+                                                </div>
+                                            <% } %>
                                         </div>
                                     </div>
+                                                      
+                                    
                                     <button type="submit" onclick="setActionType('crear')" class="nextBtn">
                                         <span class="btnText">Crear</span>
                                         <i class='bx bx-send'></i>

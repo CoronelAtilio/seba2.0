@@ -46,7 +46,7 @@ router.post('/usuario/modificar/tabla',adminControllers.modificarTabla)
 router.get('/usuario/modificar/:idusuario',adminControllers.modificarUserOne)
 
 // http://localhost:4000/administrador/usuario/modificar/docente/:idprofesor
-router.get('/usuario/modificar/docente/:idprofesor',adminControllers.modificarDocenteOne)
+router.get('/usuario/modificar/dni_docente/:dni_docente',adminControllers.modificarDocenteOne)
 
 // http://localhost:4000/administrador/usuario/modificar/dni_alumno/:idalumno
 router.get('/usuario/modificar/dni_alumno/:dni_alumno',adminControllers.modificarAlumnoOne)

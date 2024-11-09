@@ -173,7 +173,8 @@ module.exports = {
         }
     },
     crear_alu_tut: async (req, res) => {
-
+        console.log(req.body);
+        
         const actionType = req.body.actionType;
 
         if (actionType === 'crear') {
@@ -288,8 +289,145 @@ module.exports = {
                 res.status(500).send('Ocurrió un error al crear el alumno y tutor.');
             }
         } else if (actionType === 'modificar') {
-            // Lógica para modificar el alumno
+            try {
+                // Validar errores en la solicitud
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.render('admin/usuario', {
+                        errors3: errors.mapped(),
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+        
+                let {
+                    apellido_alumno, nombre_alumno, fecha_nac_alumno, email_alumno,
+                    celular_alumno, direccion_alumno, dni_alumno, genero_alumno,
+                    apellido_tutor, nombre_tutor, email_tutor,
+                    celular_tutor, direccion_tutor, dni_tutor
+                } = req.body;
+        
+                email_alumno = email_alumno.toLowerCase();
+                email_tutor = email_tutor.toLowerCase();
+        
+                let errorsObj = {};
+        
+                // Obtener el alumno actual basado en el dni
+                const alumnoActual = await db.Alumno.findOne({
+                    where: { dni_alumno }
+                });
+        
+                // Si el alumno no se encuentra, devolver un error
+                if (!alumnoActual) {
+                    errorsObj.dni_alumno = { msg: 'Alumno no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors3: errorsObj,
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+        
+                // Buscar otros alumnos con el mismo email o celular, excluyendo el actual por ID
+                const alumnoExistente = await db.Alumno.findOne({
+                    attributes: ['dni_alumno', 'email_alumno', 'celular_alumno'],
+                    where: {
+                        [Op.or]: [
+                            { email_alumno: email_alumno },
+                            { celular_alumno: celular_alumno }
+                        ],
+                        idalumno: { [Op.ne]: alumnoActual.idalumno }  // Excluir al alumno actual
+                    }
+                });
+        
+                if (alumnoExistente) {
+                    if (alumnoExistente.email_alumno === email_alumno) {
+                        errorsObj.email_alumno = { msg: 'Este Email ya existe en otro alumno' };
+                    }
+                    if (alumnoExistente.celular_alumno === celular_alumno) {
+                        errorsObj.celular_alumno = { msg: 'Este Celular ya existe en otro alumno' };
+                    }
+                }
+        
+                if (Object.keys(errorsObj).length > 0) {
+                    return res.render('admin/usuario', {
+                        errors3: errorsObj,
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+        
+                // Obtener el ID del género
+                const genero = await db.Genero.findOne({
+                    where: { nombre_genero: genero_alumno }
+                });
+        
+                if (!genero) {
+                    errorsObj.genero_alumno = { msg: 'Género no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors3: errorsObj,
+                        old3: req.body,
+                        activeForm: 'form3'
+                    });
+                }
+        
+                // Lógica para buscar o crear el tutor
+                let idNuevoTutor = null;
+                if (dni_tutor && dni_tutor.trim() !== "") {
+                    let tutor = await db.Tutor.findOne({ where: { dni_tutor } });
+                    if (!tutor) {
+                        const tutorTemp = await db.Tutor.create({
+                            apellido_tutor,
+                            nombre_tutor,
+                            email_tutor,
+                            celular_tutor,
+                            direccion_tutor,
+                            dni_tutor,
+                            estado_tutor: 1
+                        });
+                        idNuevoTutor = tutorTemp.idtutor;
+                    } else {
+                        idNuevoTutor = tutor.idtutor;
+                        await db.Tutor.update({
+                            apellido_tutor,
+                            nombre_tutor,
+                            email_tutor,
+                            celular_tutor,
+                            direccion_tutor,
+                            dni_tutor,
+                            estado_tutor: 1
+                        }, {
+                            where: { idtutor: tutor.idtutor }  // Aquí se asegura de que solo actualice el tutor con el ID correspondiente
+                        });
+                        
+                    }
+                }
+                
+                // Actualizar el alumno usando el ID obtenido
+                await db.Alumno.update(
+                    {
+                        apellido_alumno,
+                        nombre_alumno,
+                        fecha_nac_alumno,
+                        email_alumno,
+                        celular_alumno,
+                        direccion_alumno,
+                        dni_alumno,
+                        fk_idgenero_alumno: genero.idgenero,
+                        fk_idtutor_alumno: idNuevoTutor,
+                        estado_alumno: 1
+                    },
+                    { where: { idalumno: alumnoActual.idalumno } }
+                );
+
+                
+        
+                res.redirect('/administrador/usuario');
+            } catch (error) {
+                console.error("Error al modificar el alumno y tutor:", error);
+                res.status(500).send('Ocurrió un error al modificar el alumno y tutor.');
+            }
         }
+        
 
        
     },
@@ -699,10 +837,35 @@ module.exports = {
     },
     modificarDocenteOne: async (req, res) => {
         try {
-            let iddocente = req.params.iddocente
-            let docente = await db.docente.findByPk(iddocente)
+                        let dni = req.params.dni_docente
 
-            res.render('admin/modificar/modificarDocente', { docente })
+            let docente = await db.Docente.findOne({
+                include: [
+                    {
+                        model: db.Cargo,
+                        as: 'Cargo'
+                    },
+                    {
+                        model: db.Situacion,
+                        as: 'Situacion'
+                    }
+                ],
+                attributes: {
+                    exclude: ['fk_idcargo_docente', 'fk_idsituacion_docente']
+                },
+                where: {
+                    "dni_docente": dni
+                }
+            })
+            
+            if (docente) {
+                return res.render('admin/usuario', {
+                    old2: docente,
+                    activeForm: 'form2'
+                });
+            }
+            //luego hago un tratado del error por si no existe
+            res.redirect('/administrador/usuario')
         } catch (error) {
             console.error("Error modificar:", error);
             res.status(500).send('Ocurrió un error.');
@@ -730,15 +893,14 @@ module.exports = {
                     "dni_alumno": dni
                 }
             })
-            console.log(alumno);
-
+            
             if (alumno) {
                 return res.render('admin/usuario', {
                     old3: alumno,
                     activeForm: 'form3'
                 });
             }
-
+            //luego hago un tratado del error por si no existe
             res.redirect('/administrador/usuario')
         } catch (error) {
             console.error("Error modificar:", error);
