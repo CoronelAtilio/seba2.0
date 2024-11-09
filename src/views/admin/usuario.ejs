@@ -25,6 +25,7 @@
                             <!-- Formulario 1 -->
                             <form id="form1" class="form-content" style="display:none;" action="/administrador/usuario"
                                 method="post">
+                                <input type="hidden" name="actionType" class="actionType" value="">
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Crear Usuario</span>
@@ -90,16 +91,24 @@
 
                                         </div>
                                     </div>
-                                    <button class="nextBtn" type="submit">
-                                        <span class="btnText">Enviar</span>
-                                        <i class='bx bx-send'></i>
-                                    </button>
+                                    <div id="botonesEnviarModificar">
+                                        <button type="submit" onclick="setActionType(this, 'crear')" class="nextBtn">
+                                            <span class="btnText">Crear</span>
+                                            <i class='bx bx-send'></i>
+                                        </button>
+                                        
+                                        <button type="submit" onclick="setActionType(this, 'modificar')" class="nextBtn">
+                                            <span class="btnText">Modificar</span>
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
 
                             <!-- Formulario 2 -->
                             <form id="form2" class="form-content" style="display:none;"
                                 action="/administrador/usuario/docente" method="post">
+                                <input type="hidden" name="actionType" class="actionType" value="">
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Registrar Docente</span>
@@ -155,16 +164,17 @@
                                                         <% } %>
 
 
-                                                            <div class="input-field">
-                                                                <label for="nombre_cargo">Cargo</label>
-                                                                <select name="nombre_cargo" required>
-                                                                    <option disabled selected>Selecciona Cargo</option>
-                                                                    <option value="tecnico">Técnico</option>
-                                                                    <option value="director">Director</option>
-                                                                    <option value="preceptor">Preceptor</option>
-                                                                    <option value="docente">Docente</option>
-                                                                </select>
-                                                            </div>
+                                                        <div class="input-field">
+                                                            <label for="nombre_cargo">Cargo</label>
+                                                            <select name="nombre_cargo" required>
+                                                                <option disabled <%= !(locals.old2 && locals.old2.Cargo && locals.old2.Cargo.nombre_cargo) ? 'selected' : '' %>>Selecciona Cargo</option>
+                                                                <option value="tecnico" <%= (locals.old2 && locals.old2.Cargo && locals.old2.Cargo.nombre_cargo === 'tecnico') ? 'selected' : '' %>>Técnico</option>
+                                                                <option value="director" <%= (locals.old2 && locals.old2.Cargo && locals.old2.Cargo.nombre_cargo === 'director') ? 'selected' : '' %>>Director</option>
+                                                                <option value="preceptor" <%= (locals.old2 && locals.old2.Cargo && locals.old2.Cargo.nombre_cargo === 'preceptor') ? 'selected' : '' %>>Preceptor</option>
+                                                                <option value="docente" <%= (locals.old2 && locals.old2.Cargo && locals.old2.Cargo.nombre_cargo === 'docente') ? 'selected' : '' %>>Docente</option>
+                                                            </select>
+                                                        </div>
+                                                        
                                                             <div class="input-field">
                                                                 <label for="dni_docente">DNI</label>
                                                                 <input name="dni_docente" type="text"
@@ -180,29 +190,35 @@
                                                                 </div>
                                                                 <% } %>
 
-                                                                    <div class="input-field">
-                                                                        <label for="condicion">Situación</label>
-                                                                        <select name="condicion" required>
-                                                                            <option disabled selected>Selecciona
-                                                                                Situación
-                                                                            </option>
-                                                                            <option>Titular</option>
-                                                                            <option>Suplente</option>
-                                                                            <option>Interino</option>
-                                                                        </select>
-                                                                    </div>
+                                                                <div class="input-field">
+                                                                    <label for="condicion">Situación</label>
+                                                                    <select name="condicion" required>
+                                                                        <option disabled <%= !(locals.old2 && locals.old2.Situacion && locals.old2.Situacion.nombre_situacion) ? 'selected' : '' %>>Selecciona Situación</option>
+                                                                        <option value="Titular" <%= (locals.old2 && locals.old2.Situacion && locals.old2.Situacion.nombre_situacion === 'Titular') ? 'selected' : '' %>>Titular</option>
+                                                                        <option value="Suplente" <%= (locals.old2 && locals.old2.Situacion && locals.old2.Situacion.nombre_situacion === 'Suplente') ? 'selected' : '' %>>Suplente</option>
+                                                                        <option value="Interino" <%= (locals.old2 && locals.old2.Situacion && locals.old2.Situacion.nombre_situacion === 'Interino') ? 'selected' : '' %>>Interino</option>
+                                                                    </select>
+                                                                </div>
+                                                                
                                         </div>
                                     </div>
-                                    <button class="nextBtn" type="submit">
-                                        <span class="btnText">Enviar</span>
-                                        <i class='bx bx-send'></i>
-                                    </button>
+                                    <div id="botonesEnviarModificar">
+                                        <button type="submit" onclick="setActionType(this, 'crear')" class="nextBtn">
+                                            <span class="btnText">Crear</span>
+                                            <i class='bx bx-send'></i>
+                                        </button>
+                                        
+                                        <button type="submit" onclick="setActionType(this, 'modificar')" class="nextBtn">
+                                            <span class="btnText">Modificar</span>
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
 
                             <!-- Formulario 3 -->
                             <form id="form3" class="form-content" style="display:none;" action="/administrador/usuario/alumno" method="post">
-                                <input type="hidden" name="actionType" id="actionType" value="">
+                                <input type="hidden" name="actionType" class="actionType" value="">
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Alumno</span>
@@ -350,21 +366,25 @@
                                         </div>
                                     </div>
                                                       
+                                    <div id="botonesEnviarModificar">
+                                        <button type="submit" onclick="setActionType(this, 'crear')" class="nextBtn">
+                                            <span class="btnText">Crear</span>
+                                            <i class='bx bx-send'></i>
+                                        </button>
+                                        
+                                        <button type="submit" onclick="setActionType(this, 'modificar')" class="nextBtn">
+                                            <span class="btnText">Modificar</span>
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+                                    </div>
                                     
-                                    <button type="submit" onclick="setActionType('crear')" class="nextBtn">
-                                        <span class="btnText">Crear</span>
-                                        <i class='bx bx-send'></i>
-                                    </button>
-                                    
-                                    <button type="submit" onclick="setActionType('modificar')" class="nextBtn">
-                                        <span class="btnText">Modificar</span>
-                                        <i class='bx bx-edit'></i>
-                                    </button>
+                                    </div>
                                 </form>
 
                             <!-- Formulario 4 -->
                             <form id="form4" class="form-content" style="display:none;" action="/administrador/usuario/curso"
                                 method="post">
+                                <input type="hidden" name="actionType" class="actionType" value="">
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Crear Curso</span>
@@ -400,16 +420,24 @@
     
                                         </div>
                                     </div>
-                                    <button class="nextBtn" type="submit">
-                                        <span class="btnText">Enviar</span>
-                                        <i class='bx bx-send'></i>
-                                    </button>
+                                    <div id="botonesEnviarModificar">
+                                        <button type="submit" onclick="setActionType(this, 'crear')" class="nextBtn">
+                                            <span class="btnText">Crear</span>
+                                            <i class='bx bx-send'></i>
+                                        </button>
+                                        
+                                        <button type="submit" onclick="setActionType(this, 'modificar')" class="nextBtn">
+                                            <span class="btnText">Modificar</span>
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
 
                             <!-- Formulario 5 -->
                             <form id="form5" class="form-content" style="display:none;" action="/administrador/usuario/materia"
                                 method="post">
+                                <input type="hidden" name="actionType" class="actionType" value="">
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Crear Materia</span>
@@ -430,10 +458,17 @@
     
                                         </div>
                                     </div>
-                                    <button class="nextBtn" type="submit">
-                                        <span class="btnText">Enviar</span>
-                                        <i class='bx bx-send'></i>
-                                    </button>
+                                    <div id="botonesEnviarModificar">
+                                        <button type="submit" onclick="setActionType(this, 'crear')" class="nextBtn">
+                                            <span class="btnText">Crear</span>
+                                            <i class='bx bx-send'></i>
+                                        </button>
+                                        
+                                        <button type="submit" onclick="setActionType(this, 'modificar')" class="nextBtn">
+                                            <span class="btnText">Modificar</span>
+                                            <i class='bx bx-edit'></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </form>
 
@@ -453,9 +488,26 @@
                 });
             </script>
             <script>
-                function setActionType(type) {
-                    document.getElementById("actionType").value = type;
-                }
+               function setActionType(button, action) {
+    // Encuentra el formulario más cercano al botón
+    const form = button.closest('form');
+    
+    if (form) {
+        // Selecciona el campo actionType dentro del formulario encontrado
+        const actionTypeInput = form.querySelector('input[name="actionType"]');
+        
+        if (actionTypeInput) {
+            // Establece el valor del campo actionType y envía el formulario
+            actionTypeInput.value = action;
+            form.submit();
+        } else {
+            console.error("Campo 'actionType' no encontrado en el formulario.");
+        }
+    } else {
+        console.error("Formulario no encontrado.");
+    }
+}
+
                 </script>
                 
             

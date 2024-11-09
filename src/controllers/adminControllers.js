@@ -79,7 +79,12 @@ module.exports = {
         }
     },
     crear_docente: async (req, res) => {
-        try {
+        const actionType = req.body.actionType;
+
+        if (actionType === 'crear') {
+            // Lógica para crear el alumno
+            try {
+        
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
                 return res.render('admin/usuario', {
@@ -168,16 +173,127 @@ module.exports = {
             res.redirect('/administrador/usuario');
 
         } catch (error) {
-            console.log(error.message);
-            res.send(error.message);
+            console.error("Error al crear el alumno y tutor:", error);
+            res.status(500).send('Ocurrió un error al crear el alumno y tutor.');
         }
-    },
+    }else if (actionType === 'modificar') {
+            try {
+                // Validar errores en la solicitud
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.render('admin/usuario', {
+                        errors2: errors.mapped(),
+                        old2: req.body,
+                        activeForm: 'form2'
+                    });
+                }
+        
+                let { apellido_docente, nombre_docente, fecha_nac_docente, email_docente, celular_docente, nombre_cargo, dni_docente, condicion } = req.body;
+                email_docente = email_docente.toLowerCase();
+                let errorsObj = {};
+        
+                // Obtener el docente actual basado en el DNI
+                const docenteActual = await db.Docente.findOne({
+                    where: { dni_docente }
+                });
+        
+                // Verificar si el docente existe
+                if (!docenteActual) {
+                    errorsObj.dni_docente = { msg: 'Docente no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors2: errorsObj,
+                        old2: req.body,
+                        activeForm: 'form2'
+                    });
+                }
+        
+                // Verificar si existen otros docentes con el mismo email o celular, excluyendo al actual
+                const docenteExistente = await db.Docente.findOne({
+                    attributes: ['dni_docente', 'email_docente', 'celular_docente'],
+                    where: {
+                        [Op.or]: [
+                            { email_docente },
+                            { celular_docente }
+                        ],
+                        iddocente: { [Op.ne]: docenteActual.iddocente }  // Excluir el docente actual
+                    }
+                });
+        
+                // Validar que el email y el celular no están en uso por otro docente
+                if (docenteExistente) {
+                    if (docenteExistente.email_docente === email_docente) {
+                        errorsObj.email_docente = { msg: 'Este Email ya existe en otro docente' };
+                    }
+                    if (docenteExistente.celular_docente === celular_docente) {
+                        errorsObj.celular_docente = { msg: 'Este Celular ya existe en otro docente' };
+                    }
+                }
+        
+                if (Object.keys(errorsObj).length > 0) {
+                    return res.render('admin/usuario', {
+                        errors2: errorsObj,
+                        old2: req.body,
+                        activeForm: 'form2'
+                    });
+                }
+        
+                // Buscar el cargo y situación correspondientes
+                const cargo = await db.Cargo.findOne({ where: { nombre_cargo } });
+                const situacion = await db.Situacion.findOne({ where: { nombre_situacion: condicion } });
+        
+                // Validar existencia de cargo y situación
+                if (!cargo) {
+                    errorsObj.nombre_cargo = { msg: 'Cargo no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors2: errorsObj,
+                        old2: req.body,
+                        activeForm: 'form2'
+                    });
+                }
+        
+                if (!situacion) {
+                    errorsObj.condicion = { msg: 'Situación no encontrada' };
+                    return res.render('admin/usuario', {
+                        errors2: errorsObj,
+                        old2: req.body,
+                        activeForm: 'form2'
+                    });
+                }
+        
+                // Actualizar el docente usando el ID obtenido
+                await db.Docente.update(
+                    {
+                        apellido_docente,
+                        nombre_docente,
+                        fecha_nac_docente,
+                        email_docente,
+                        celular_docente,
+                        dni_docente,
+                        fk_idcargo_docente: cargo.idcargo,
+                        fk_idsituacion_docente: situacion.idsituacion,
+                        estado_docente: 1
+                    },
+                    { where: { iddocente: docenteActual.iddocente } }
+                );
+        
+                res.redirect('/administrador/usuario');
+        
+            } catch (error) {
+                console.error("Error al modificar el docente:", error);
+                res.status(500).send('Ocurrió un error al modificar el docente.');
+            }
+        }
+        
+},
     crear_alu_tut: async (req, res) => {
+        console.log("paso por crearalutut");
         console.log(req.body);
         
         const actionType = req.body.actionType;
 
         if (actionType === 'crear') {
+            console.log("paso por crear");
+            
             // Lógica para crear el alumno
             try {
                 // Validar errores en la solicitud
@@ -289,7 +405,11 @@ module.exports = {
                 res.status(500).send('Ocurrió un error al crear el alumno y tutor.');
             }
         } else if (actionType === 'modificar') {
+            console.log("paso por modificar");
+            
             try {
+                console.log(req.body);
+                
                 // Validar errores en la solicitud
                 const errors = validationResult(req);
                 if (!errors.isEmpty()) {
@@ -826,10 +946,10 @@ module.exports = {
     },
     modificarUserOne: async (req, res) => {
         try {
-            let idusuario = req.params.idusuario
-            let usuario = await db.Usuario.findByPk(idusuario)
-
-            res.render('admin/modificar/modificarUsuario', { usuario })
+            let idusuario = req.params.nuevo_usuario
+            console.log(idusuario);
+            
+            res.redirect('/administrador/usuario')
         } catch (error) {
             console.error("Error modificar:", error);
             res.status(500).send('Ocurrió un error.');

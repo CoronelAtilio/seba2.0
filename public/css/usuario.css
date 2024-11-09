@@ -261,7 +261,10 @@ form .buttons button,
     display: flex;
   }
   
-
+#botonesEnviarModificar{
+  display: flex;
+  justify-content: space-around;
+}
 
 @media (max-width: 750px) {
     .container form {
