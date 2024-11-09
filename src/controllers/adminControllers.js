@@ -9,75 +9,175 @@ module.exports = {
         res.render('admin/usuario')
     },
     crear_usuario: async (req, res) => {
-        try {
-            const errors = validationResult(req);
-            let errorsObj = errors.mapped();
-            const { nombre_usuario, password_usuario, password_usuario2, permisos, dni_docente } = req.body;
-
-            // Verificación de contraseñas
-            if (password_usuario !== password_usuario2) {
-                errorsObj.password_usuario2 = { msg: 'No Coinciden Contraseñas' };
-            }
-
-            // Verificación de existencia de usuario
-            const usuarioBuscado = await db.Usuario.findOne({
-                where: { nombre_usuario }
-            });
-
-            if (usuarioBuscado) {
-                errorsObj.nombre_usuario = { msg: 'Este usuario ya Existe' };
-            }
-
-            // Verificación de existencia de profesoor
-            const docenteBuscado = await db.Docente.findOne({
-                where: { dni_docente }
-            });
-
-            if (!docenteBuscado) {
-                errorsObj.dni_docente = { msg: 'Este Docente no existe. Primero crea el docente' };
-            }
-            // Retorno de errores si existen
-            if (Object.keys(errorsObj).length > 0) {
-                return res.render('admin/usuario', {
-                    errors1: errorsObj,
-                    old1: req.body,
-                    activeForm: 'form1' // ID del formulario a mostrar
+        const actionType = req.body.actionType;
+    
+        if (actionType === 'crear') {
+            try {
+                // Validación de errores
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.render('admin/usuario', {
+                        errors1: errors.mapped(),
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                let { nombre_usuario, password_usuario, password_usuario2, permisos, dni_docente } = req.body;
+                let errorsObj = {};
+    
+                // Verificación de contraseñas
+                if (password_usuario !== password_usuario2) {
+                    errorsObj.password_usuario2 = { msg: 'No Coinciden Contraseñas' };
+                }
+    
+                // Verificación de existencia de usuario
+                const usuarioExistente = await db.Usuario.findOne({
+                    where: { nombre_usuario }
                 });
-            }
-
-            // Búsqueda de cargo y creación de usuario de manera asíncrona
-            const rolPromise = db.Rol.findOne({
-                where: { nombre_rol: permisos.toLowerCase() }
-            });
-
-            const hashedPasswordPromise = bcrypt.hash(password_usuario, 10);
-
-            const [rol, hashedPassword] = await Promise.all([rolPromise, hashedPasswordPromise]);
-
-            if (!rol) {
-                errorsObj.nombre_cargo = { msg: 'Cargo no encontrado' };
-                return res.render('admin/usuario', {
-                    errors1: errorsObj,
-                    old1: req.body,
-                    activeForm: 'form1'
+    
+                if (usuarioExistente) {
+                    errorsObj.nombre_usuario = { msg: 'Este usuario ya Existe' };
+                }
+    
+                // Verificación de existencia de docente
+                const docenteExistente = await db.Docente.findOne({
+                    where: { dni_docente }
                 });
+    
+                if (!docenteExistente) {
+                    errorsObj.dni_docente = { msg: 'Este Docente no existe. Primero crea el docente' };
+                }
+    
+                if (Object.keys(errorsObj).length > 0) {
+                    return res.render('admin/usuario', {
+                        errors1: errorsObj,
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                // Promesas para buscar el rol y hashear la contraseña
+                const rolPromise = db.Rol.findOne({ where: { nombre_rol: permisos.toLowerCase() } });
+                const hashedPasswordPromise = bcrypt.hash(password_usuario, 10);
+    
+                // Esperar a que las promesas se resuelvan
+                const [rol, hashedPassword] = await Promise.all([rolPromise, hashedPasswordPromise]);
+    
+                // Verificación de existencia de rol
+                if (!rol) {
+                    errorsObj.permisos = { msg: 'Rol no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors1: errorsObj,
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                // Crear el usuario
+                await db.Usuario.create({
+                    nombre_usuario,
+                    password_usuario: hashedPassword,
+                    fk_idrol_usuario: rol.idrol,
+                    fk_iddocente_usuario: docenteExistente.iddocente,
+                    estado_usuario: 1
+                });
+    
+                // Redirección tras la creación exitosa
+                res.redirect('/administrador/usuario');
+    
+            } catch (error) {
+                console.error("Error al crear el usuario:", error);
+                res.status(500).send('Ocurrió un error al crear el usuario.');
             }
-            await db.Usuario.create({
-                password_usuario: hashedPassword,
-                nombre_usuario,
-                fk_idrol_usuario: rol.idrol,
-                fk_iddocente_usuario: docenteBuscado.iddocente,
-                estado_usuario: 1
-            });
-
-            // Redirección tras la creación exitosa
-            res.redirect('/administrador/usuario');
-
-        } catch (error) {
-            console.log(error.message);
-            res.status(500).send('Error del servidor: ' + error.message);
+        } else if (actionType === 'modificar') {
+            try {
+                // Validar errores en la solicitud
+                const errors = validationResult(req);
+                if (!errors.isEmpty()) {
+                    return res.render('admin/usuario', {
+                        errors1: errors.mapped(),
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                let { nombre_usuario, password_usuario, password_usuario2, permisos, dni_docente } = req.body;
+                let errorsObj = {};
+    
+                // Verificación de existencia de usuario actual
+                const usuarioActual = await db.Usuario.findOne({
+                    where: { nombre_usuario }
+                });
+    
+                if (!usuarioActual) {
+                    errorsObj.nombre_usuario = { msg: 'Usuario no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors1: errorsObj,
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                // Verificación de contraseñas
+                if (password_usuario !== password_usuario2) {
+                    errorsObj.password_usuario2 = { msg: 'No Coinciden Contraseñas' };
+                }
+    
+                // Verificación de existencia de docente
+                const docenteExistente = await db.Docente.findOne({
+                    where: { dni_docente }
+                });
+    
+                if (!docenteExistente) {
+                    errorsObj.dni_docente = { msg: 'Este Docente no existe. Primero crea el docente' };
+                }
+    
+                if (Object.keys(errorsObj).length > 0) {
+                    return res.render('admin/usuario', {
+                        errors1: errorsObj,
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                // Buscar el rol y hashear la nueva contraseña (si es que se cambia)
+                const rol = await db.Rol.findOne({ where: { nombre_rol: permisos.toLowerCase() } });
+                let hashedPassword = usuarioActual.password_usuario;
+                if (password_usuario) {
+                    hashedPassword = await bcrypt.hash(password_usuario, 10);
+                }
+    
+                if (!rol) {
+                    errorsObj.permisos = { msg: 'Rol no encontrado' };
+                    return res.render('admin/usuario', {
+                        errors1: errorsObj,
+                        old1: req.body,
+                        activeForm: 'form1'
+                    });
+                }
+    
+                // Actualizar el usuario
+                await db.Usuario.update(
+                    {
+                        nombre_usuario,
+                        password_usuario: hashedPassword,
+                        fk_idrol_usuario: rol.idrol,
+                        fk_iddocente_usuario: docenteExistente.iddocente,
+                        estado_usuario: 1
+                    },
+                    { where: { idusuario: usuarioActual.idusuario } }
+                );
+    
+                // Redirección tras la modificación exitosa
+                res.redirect('/administrador/usuario');
+    
+            } catch (error) {
+                console.error("Error al modificar el usuario:", error);
+                res.status(500).send('Ocurrió un error al modificar el usuario.');
+            }
         }
-    },
+    },    
     crear_docente: async (req, res) => {
         const actionType = req.body.actionType;
 
@@ -947,7 +1047,40 @@ module.exports = {
     modificarUserOne: async (req, res) => {
         try {
             let idusuario = req.params.nuevo_usuario
-            console.log(idusuario);
+            
+            let usuario = await db.Usuario.findOne({
+                include: [
+                    {
+                        model: db.Rol,
+                        as: 'Rol'
+                    },
+                    {
+                        model: db.Docente,
+                        as: 'Docente'
+                    }
+                ],
+                attributes: {
+                    exclude: ['fk_iddocente_usuario', 'fk_idrol_usuario']
+                },
+                where: {
+                    "nombre_usuario": idusuario
+                }
+            })
+            const old1 = {
+                nombre_usuario: usuario.dataValues.nombre_usuario,
+                nombre_rol: usuario.dataValues.Rol ? usuario.dataValues.Rol.dataValues.nombre_rol : null,
+                dni_docente: usuario.dataValues.Docente ? usuario.dataValues.Docente.dataValues.dni_docente : null
+            };
+            
+            
+            if (usuario) {
+                return res.render('admin/usuario', {
+                    old1,
+                    activeForm: 'form1'
+                });
+            }
+            //luego hago un tratado del error por si no existe
+            res.redirect('/administrador/usuario')
             
             res.redirect('/administrador/usuario')
         } catch (error) {

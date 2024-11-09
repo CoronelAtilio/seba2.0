@@ -63,17 +63,17 @@
                                                         </div>
                                                         <% } %>
 
-                                                            <div class="input-field">
-                                                                <label for="permisos">Rol</label>
-                                                                <select name="permisos" required>
-                                                                    <option disabled selected>Selecciona Rol de Usuario
-                                                                    </option>
-                                                                    <option>Administrador</option>
-                                                                    <option>Preceptor</option>
-                                                                    <option>Docente</option>
-                                                                    <option>Director</option>
-                                                                </select>
-                                                            </div>
+                                                        <div class="input-field">
+                                                            <label for="permisos">Rol</label>
+                                                            <select name="permisos" required>
+                                                                <option disabled <%= !(locals.old1  && locals.old1.permisos) ? 'selected' : '' %>>Selecciona Rol de Usuario</option>
+                                                                <option value="Administrador" <%= (locals.old1 && locals.old1 && locals.old1.nombre_rol === 'administrador') ? 'selected' : '' %>>Administrador</option>
+                                                                <option value="Preceptor" <%= (locals.old1 && locals.old1 && locals.old1.nombre_rol === 'preceptor') ? 'selected' : '' %>>Preceptor</option>
+                                                                <option value="Docente" <%= (locals.old1 && locals.old1 && locals.old1.nombre_rol === 'docente') ? 'selected' : '' %>>Docente</option>
+                                                                <option value="Director" <%= (locals.old1 && locals.old1 && locals.old1.nombre_rol === 'director') ? 'selected' : '' %>>Director</option>
+                                                            </select>
+                                                        </div>
+                                                        
                                                             <div class="input-field">
                                                                 <label for="dni_docente">DNI</label>
                                                                 <input name="dni_docente" type="text"
