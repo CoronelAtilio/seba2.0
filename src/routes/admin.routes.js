@@ -51,6 +51,9 @@ router.get('/usuario/modificar/dni_docente/:dni_docente',adminControllers.modifi
 // http://localhost:4000/administrador/usuario/modificar/dni_alumno/:idalumno
 router.get('/usuario/modificar/dni_alumno/:dni_alumno',adminControllers.modificarAlumnoOne)
 
+// http://localhost:4000/administrador/usuario/modificar/idcurso/:idcurso
+router.get('/usuario/modificar/idcurso/:idcurso',adminControllers.modificarCursoOne)
+
 
 //Eliminar
 // http://localhost:4000/administrador/usuario/modificar/:idusuario
