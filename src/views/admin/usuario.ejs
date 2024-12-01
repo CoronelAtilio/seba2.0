@@ -526,6 +526,11 @@
                             <form id="form5" class="form-content" style="display:none;"
                                 action="/administrador/usuario/materia" method="post">
                                 <input type="hidden" name="actionType" class="actionType" value="">
+
+                                  <!-- Campo oculto para enviar el idcurso cuando se modifique -->
+                                  <input type="hidden" name="idmateria"
+                                  value="<%= locals.old5 && old5.idmateria ? old5.idmateria : '' %>">
+
                                 <div class="form first">
                                     <div class="details personal">
                                         <span class="title">Crear Materia</span>

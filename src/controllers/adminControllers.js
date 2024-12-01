@@ -770,55 +770,106 @@ module.exports = {
     }
 },
     crear_materia: async (req, res) => {
-        try {
-            // Validar errores en la solicitud
-            //   const errors = validationResult(req);
-            //   if (!errors.isEmpty()) {
-            //       return res.render('admin/usuario', {
-            //           errors3: errors.mapped(),
-            //           old3: req.body,
-            // activeForm: 'form3'
-            //       });
-            //   }
-
-            let errorsObj = {};
-            //limpieza de materia
-            const removeAccents = (str) => {
-                return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            }
-
-            let { nombre_materia } = req.body;
-            nombre_materia = nombre_materia.toLowerCase();
-            nombre_materia = removeAccents(nombre_materia); // Quitar acentos
-            nombre_materia = nombre_materia.trim(); // Quitar espacios al principio y al final
-
-
-            const materiaExistente = await db.Materia.findOne({
-                where: {
-                    nombre_materia: nombre_materia
+            const actionType = req.body.actionType;
+        
+            if (actionType === 'crear') {
+            try {
+                let errorsObj = {};
+                //limpieza de materia
+                const removeAccents = (str) => {
+                    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
                 }
-            });
-            if (materiaExistente) {
-                errorsObj.nombre_materia = { msg: 'Materia existente, prueba otro nombre' };
-                return res.render('admin/usuario', {
-                    errors5: errorsObj,
-                    old5: req.body,
-                    activeForm: 'form5'
+    
+                let { nombre_materia } = req.body;
+                nombre_materia = nombre_materia.toLowerCase();
+                nombre_materia = removeAccents(nombre_materia); // Quitar acentos
+                nombre_materia = nombre_materia.trim(); // Quitar espacios al principio y al final
+    
+    
+                const materiaExistente = await db.Materia.findOne({
+                    where: {
+                        nombre_materia: nombre_materia
+                    }
                 });
-
-            } else {
-
-                await db.Materia.create({
-                    nombre_materia: nombre_materia,
-                    estado_materia: 1
+                if (materiaExistente) {
+                    errorsObj.nombre_materia = { msg: 'Materia existente, prueba otro nombre' };
+                    return res.render('admin/usuario', {
+                        errors5: errorsObj,
+                        old5: req.body,
+                        activeForm: 'form5'
+                    });
+    
+                } else {
+    
+                    await db.Materia.create({
+                        nombre_materia: nombre_materia,
+                        estado_materia: 1
+                    });
+    
+                    return res.redirect('/administrador/usuario');
+                }
+            } catch (error) {
+                console.error("Error al crear el materia:", error);
+                res.status(500).send('Ocurrió un error al crear el materia.');
+            } 
+        } else if (actionType === 'modificar') { 
+            try {
+                let errorsObj = {};
+                let { idmateria, nombre_materia } = req.body;
+                
+                // Limpieza de nombre_materia
+                const removeAccents = (str) => {
+                    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                };
+    
+                nombre_materia = nombre_materia.toLowerCase();
+                nombre_materia = removeAccents(nombre_materia); // Quitar acentos
+                nombre_materia = nombre_materia.trim(); // Quitar espacios al principio y al final
+    
+                // Verificar si la materia existe
+                const materiaActual = await db.Materia.findByPk(idmateria);
+                if (!materiaActual) {
+                    errorsObj.idmateria = { msg: 'Materia no encontrada' };
+                    return res.render('admin/usuario', {
+                        errors5: errorsObj,
+                        old5: req.body,
+                        activeForm: 'form5'
+                    });
+                }
+    
+                // Buscar si existe otra materia con el mismo nombre, excluyendo la actual
+                const materiaExistente = await db.Materia.findOne({
+                    where: {
+                        nombre_materia: nombre_materia,
+                        idmateria: { [Op.ne]: idmateria } // Excluir la materia actual
+                    }
                 });
-
-                return res.redirect('/administrador/usuario');
+    
+                if (materiaExistente) {
+                    errorsObj.nombre_materia = { msg: 'Nombre de materia ya existe en otra materia' };
+                    return res.render('admin/usuario', {
+                        errors5: errorsObj,
+                        old5: req.body,
+                        activeForm: 'form5'
+                    });
+                }
+    
+                // Actualizar la materia
+                await db.Materia.update(
+                    {
+                        nombre_materia: nombre_materia,
+                        estado_materia: 1
+                    },
+                    { where: { idmateria: idmateria } }
+                );
+    
+                res.redirect('/administrador/usuario');
+            } catch (error) {
+                console.error("Error al modificar la materia:", error);
+                res.status(500).send('Ocurrió un error al modificar la materia.');
             }
-        } catch (error) {
-            console.error("Error al crear la materia:", error);
-            res.status(500).send('Ocurrió un error al crear la materia.');
         }
+
     },
     modificar: async (req, res) => {
         try {
@@ -1254,6 +1305,29 @@ module.exports = {
                 return res.render('admin/usuario', {
                     old4: curso,
                     activeForm: 'form4'
+                });
+            }
+            //luego hago un tratado del error por si no existe
+            res.redirect('/administrador/usuario')
+        } catch (error) {
+            console.error("Error modificar:", error);
+            res.status(500).send('Ocurrió un error.');
+        }
+    },
+    modificarMateriaOne: async (req, res) => {
+        try {
+            let idmateria = req.params.idmateria
+            
+            let materia = await db.Materia.findOne({
+                where: {
+                    "idmateria": idmateria
+                }
+            })
+
+            if (materia) {
+                return res.render('admin/usuario', {
+                    old5: materia,
+                    activeForm: 'form5'
                 });
             }
             //luego hago un tratado del error por si no existe

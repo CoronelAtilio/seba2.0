@@ -12,11 +12,18 @@ module.exports = {
   materiaCurso: async (req, res) => {
     try {
       const [materias, cursos, turnos] = await Promise.all([
-        db.Materia.findAll(),
+        db.Materia.findAll({
+          where:{
+            "estado_materia":1
+          }
+        }),
         db.Curso.findAll({
           attributes: [
             [Sequelize.fn('DISTINCT', Sequelize.col('anio_curso')), 'anio_curso']
-          ]
+          ],
+          where:{
+            "estado_curso":1
+          }
         })
       ]);
 
@@ -163,13 +170,22 @@ module.exports = {
               include: [{
                 model:db.Turno,
                 as: 'Turno',
-                attributes:['nombre_turno']
-              }]
+                attributes:['nombre_turno'],
+                where:{
+                  estado_turno:1
+                }
+              }],
+              where:{
+                estado_curso:1
+              }
             },
             {
               model: db.Materia,
               as: 'Materia',
-              attributes: ['nombre_materia']
+              attributes: ['nombre_materia'],
+              where:{
+                estado_materia:1
+              }
             }
           ],
           attributes: {
@@ -181,7 +197,10 @@ module.exports = {
             'iddocente',
             'apellido_docente',
             'nombre_docente'
-          ]
+          ],
+          where:{
+            estado_docente:1
+          }
         })
       ]);
 
@@ -242,34 +261,38 @@ module.exports = {
   MateriaCursoAlumno: async (req, res) => {
     try {
       const [cursos, alumnos] = await Promise.all([
-        db.Curso.findAll({
-          attributes: ['idcurso', 'anio_curso', 'division_curso'],
-          include: [{
-            model: db.Turno,
-            as: 'Turno',
-            attributes: ['nombre_turno']
-          }]
-        }),
-        db.Alumno.findAll({
-          where: {
-            createdAt: {
-              [Op.gte]: startOfYear,
-              [Op.lt]: endOfYear
-            }
-          },
-          attributes: ['idalumno', 'apellido_alumno', 'nombre_alumno'],
-          include: [{
-            model: db.Nota,
-            as: 'Notas',
-            required: false, // LEFT JOIN para incluir alumnos sin notas
-            attributes: [],  // No necesitamos datos de la tabla Notas
-          }],
-          where: {
-            '$Notas.fk_idalumno_nota$': {
-              [Op.is]: null // Solo alumnos sin relación en la tabla Notas
-            }
-          }
-        })
+          db.Curso.findAll({
+              attributes: ['idcurso', 'anio_curso', 'division_curso'],
+              include: [{
+                  model: db.Turno,
+                  as: 'Turno',
+                  attributes: ['nombre_turno'],
+                  where:{
+                    estado_turno:1
+                  }
+              }],
+              where:{
+                estado_curso:1
+              }
+          }),
+          db.Alumno.findAll({
+              where: {
+                  createdAt: {
+                      [Op.gte]: startOfYear,
+                      [Op.lt]: endOfYear
+                  },
+                  estado_alumno: 1 // Condición para incluir solo alumnos con estado_alumno igual a 1
+              },
+              attributes: ['idalumno', 'apellido_alumno', 'nombre_alumno'],
+              include: [{
+                  model: db.Nota,
+                  as: 'Notas',
+                  required: false, // LEFT JOIN para incluir alumnos sin notas
+                  attributes: []  // No necesitamos datos de la tabla Notas
+              }],
+              // Esta segunda condición "where" está incorrecta en tu código,
+              // pues debería estar como parte de la relación `Notas` en el `include`.
+          })
       ]);
       
       

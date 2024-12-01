@@ -23,14 +23,16 @@ module.exports = {
             let [materia, curso] = await Promise.all([
                 db.Materia.findOne({
                     where: {
-                        "nombre_materia": nombre_materia
+                        "nombre_materia": nombre_materia,
+                        "estado_materia":1
                     },
                     attributes: ["idmateria"]
                 }),
                 db.Curso.findOne({
                     where: {
                         "anio_curso": anio,
-                        "division_curso": division
+                        "division_curso": division,
+                        "estado_curso":1
                     },
                     attributes: ["idcurso"]
                 })
@@ -59,7 +61,10 @@ module.exports = {
                         {
                             model: db.Alumno,
                             as: 'Alumno',
-                            attributes: ['dni_alumno','apellido_alumno','nombre_alumno'] 
+                            attributes: ['dni_alumno','apellido_alumno','nombre_alumno'],
+                            where: { 
+                                estado_alumno: 1
+                            }
                         }
                     ],
                     attributes: {
@@ -76,14 +81,61 @@ module.exports = {
             res.status(500).send('Ocurrió un error al obtener los cursos.');
         }
     },
-    nota_alu: async(req,res)=>{
+    nota_alu: async (req, res) => {
         try {
             console.log(req.body);
             
-            res.redirect('/docente')
+
+            const { example_length, ...notas } = req.body; // Separar example_length del resto de las notas
+            const updates = {}; // Objeto para almacenar las actualizaciones agrupadas por idnota
+    
+            // Procesar todas las claves
+            for (const key in notas) {
+                const [campoNota, idnota] = key.split('_'); // Separar el campo (nota1, nota2, etc.) del idnota
+    
+                // Validar que la clave tiene el formato esperado
+                if (!campoNota || !idnota) continue;
+    
+                if (!updates[idnota]) updates[idnota] = {}; // Crear una entrada para este idnota si no existe
+                updates[idnota][campoNota + '_nota'] = notas[key] !== '' ? parseFloat(notas[key]) : null; // Asignar valor o null
+            }
+    
+            // Calcular nota3 como el promedio de nota1 y nota2
+            for (const idnota in updates) {
+                const nota1 = updates[idnota].nota1_nota ?? null; // Obtener nota1
+                const nota2 = updates[idnota].nota2_nota ?? null; // Obtener nota2
+    
+                // Verificar si ambos valores existen
+                if (nota1 !== null && nota2 !== null) {
+                    const promedio = (nota1 + nota2) / 2;
+                    updates[idnota].nota3_nota = parseFloat(promedio.toFixed(2)); // Calcular y redondear a 2 decimales
+                } else {
+                    updates[idnota].nota3_nota = null; // Si falta alguno, dejar nota3 como null
+                }
+            }
+    
+            // Validar que la cantidad de registros coincide con example_length
+            const idsProcesados = Object.keys(updates).length;
+            if (idsProcesados !== parseInt(example_length)) {
+                return res.status(400).send(`Error: Se esperaban ${example_length} registros, pero se procesaron ${idsProcesados}.`);
+            }
+    
+            // Debug adicional: Mostrar los datos que se actualizarán
+            console.log("Datos preparados para la BD:", updates);
+    
+            // Actualizar cada registro en la base de datos
+            const promises = Object.keys(updates).map(async (idnota) => {
+                const data = updates[idnota];
+                await db.Nota.update(data, { where: { idnota } });
+            });
+    
+            await Promise.all(promises); // Ejecutar todas las actualizaciones en paralelo
+    
+            // Redirigir al usuario con un mensaje de éxito
+            res.redirect('/docente');
         } catch (error) {
-            console.error("Error al obtener cursos:", error);
-            res.status(500).send('Ocurrió un error al obtener los cursos.');
+            console.error("Error al procesar las notas:", error);
+            res.status(500).send('Ocurrió un error al procesar las notas.');
         }
     }
 };
