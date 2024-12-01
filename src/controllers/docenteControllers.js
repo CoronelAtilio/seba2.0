@@ -84,8 +84,7 @@ module.exports = {
     nota_alu: async (req, res) => {
         try {
             console.log(req.body);
-            
-
+    
             const { example_length, ...notas } = req.body; // Separar example_length del resto de las notas
             const updates = {}; // Objeto para almacenar las actualizaciones agrupadas por idnota
     
@@ -114,11 +113,9 @@ module.exports = {
                 }
             }
     
-            // Validar que la cantidad de registros coincide con example_length
+            // Mostrar la cantidad de registros procesados
             const idsProcesados = Object.keys(updates).length;
-            if (idsProcesados !== parseInt(example_length)) {
-                return res.status(400).send(`Error: Se esperaban ${example_length} registros, pero se procesaron ${idsProcesados}.`);
-            }
+            console.log(`Cantidad de registros procesados: ${idsProcesados}`);
     
             // Debug adicional: Mostrar los datos que se actualizarán
             console.log("Datos preparados para la BD:", updates);

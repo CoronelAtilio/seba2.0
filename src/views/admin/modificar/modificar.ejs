@@ -76,7 +76,12 @@
                                                 
                                                 <!-- Toggle button con lógica de data-id y data-estado consistentes -->
                                                 <td>
-                                                    <div class="toggle-btn-delete <%= lastValue === 1 ? 'active-delete' : '' %>" data-id="<%= firstValue %>" data-estado="<%= lastValue %>">
+                                                    <div 
+                                                        class="toggle-btn-delete <%= lastValue === 1 ? 'active-delete' : '' %>" 
+                                                        data-id="<%= firstValue %>" 
+                                                        data-estado="<%= lastValue %>" 
+                                                        data-tabla="<%= tabla %>" 
+                                                    >
                                                         <div class="inner-circle-delete"></div>
                                                     </div>
                                                 </td>

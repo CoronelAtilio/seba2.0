@@ -63,9 +63,9 @@ router.get('/usuario/modificar/idmateria/:idmateria',adminControllers.modificarM
 router.post('/usuario/modificar/:idusuario',adminControllers.eliminarUser)
 
 // http://localhost:4000/administrador/usuario/modificar/docente/:idprofesor
-router.post('/usuario/modificar/docente/:idprofesor',adminControllers.eliminarDocente)
+router.post('/usuario/modificar/docentes/:idprofesor',adminControllers.eliminarDocente)
 
 // http://localhost:4000/administrador/usuario/modificar/alumno/:idalumno
-router.post('/usuario/modificar/alumno/:idalumno',adminControllers.eliminarAlumno)
+router.post('/usuario/modificar/alumnos/:idalumno',adminControllers.eliminarAlumno)
 
 module.exports = router;

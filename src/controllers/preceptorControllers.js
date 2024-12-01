@@ -13,16 +13,16 @@ module.exports = {
     try {
       const [materias, cursos, turnos] = await Promise.all([
         db.Materia.findAll({
-          where:{
-            "estado_materia":1
+          where: {
+            "estado_materia": 1
           }
         }),
         db.Curso.findAll({
           attributes: [
             [Sequelize.fn('DISTINCT', Sequelize.col('anio_curso')), 'anio_curso']
           ],
-          where:{
-            "estado_curso":1
+          where: {
+            "estado_curso": 1
           }
         })
       ]);
@@ -117,7 +117,7 @@ module.exports = {
           };
           return acc;
         }, {});
-        
+
 
         let materiasFinal = valoresError.map(item => ({
           ...item,
@@ -135,14 +135,14 @@ module.exports = {
         const newCombinations = [];
         for (let materia of materias) {
           for (let curso of idCursos) {
-              newCombinations.push({
-                fk_idmateria_materiacurso: materia,
-                fk_idcurso_materiacurso: curso,
-                estado_materiacurso: 1
-              });
+            newCombinations.push({
+              fk_idmateria_materiacurso: materia,
+              fk_idcurso_materiacurso: curso,
+              estado_materiacurso: 1
+            });
           }
         }
-      
+
 
         await db.Materia_Curso.bulkCreate(newCombinations, { ignoreDuplicates: false });
 
@@ -168,23 +168,23 @@ module.exports = {
               as: 'Curso',
               attributes: ['anio_curso', 'division_curso'],
               include: [{
-                model:db.Turno,
+                model: db.Turno,
                 as: 'Turno',
-                attributes:['nombre_turno'],
-                where:{
-                  estado_turno:1
+                attributes: ['nombre_turno'],
+                where: {
+                  estado_turno: 1
                 }
               }],
-              where:{
-                estado_curso:1
+              where: {
+                estado_curso: 1
               }
             },
             {
               model: db.Materia,
               as: 'Materia',
               attributes: ['nombre_materia'],
-              where:{
-                estado_materia:1
+              where: {
+                estado_materia: 1
               }
             }
           ],
@@ -198,8 +198,8 @@ module.exports = {
             'apellido_docente',
             'nombre_docente'
           ],
-          where:{
-            estado_docente:1
+          where: {
+            estado_docente: 1
           }
         })
       ]);
@@ -261,42 +261,42 @@ module.exports = {
   MateriaCursoAlumno: async (req, res) => {
     try {
       const [cursos, alumnos] = await Promise.all([
-          db.Curso.findAll({
-              attributes: ['idcurso', 'anio_curso', 'division_curso'],
-              include: [{
-                  model: db.Turno,
-                  as: 'Turno',
-                  attributes: ['nombre_turno'],
-                  where:{
-                    estado_turno:1
-                  }
-              }],
-              where:{
-                estado_curso:1
-              }
-          }),
-          db.Alumno.findAll({
-              where: {
-                  createdAt: {
-                      [Op.gte]: startOfYear,
-                      [Op.lt]: endOfYear
-                  },
-                  estado_alumno: 1 // Condición para incluir solo alumnos con estado_alumno igual a 1
-              },
-              attributes: ['idalumno', 'apellido_alumno', 'nombre_alumno'],
-              include: [{
-                  model: db.Nota,
-                  as: 'Notas',
-                  required: false, // LEFT JOIN para incluir alumnos sin notas
-                  attributes: []  // No necesitamos datos de la tabla Notas
-              }],
-              // Esta segunda condición "where" está incorrecta en tu código,
-              // pues debería estar como parte de la relación `Notas` en el `include`.
-          })
+        db.Curso.findAll({
+          attributes: ['idcurso', 'anio_curso', 'division_curso'],
+          include: [{
+            model: db.Turno,
+            as: 'Turno',
+            attributes: ['nombre_turno'],
+            where: {
+              estado_turno: 1
+            }
+          }],
+          where: {
+            estado_curso: 1
+          }
+        }),
+        db.Alumno.findAll({
+          where: {
+            createdAt: {
+              [Op.gte]: startOfYear,
+              [Op.lt]: endOfYear
+            },
+            estado_alumno: 1,
+            // Verificar que no haya relación en la tabla Notas
+            [Op.not]: {
+              '$Notas.fk_idalumno_nota$': { [Op.ne]: null }
+            }
+          },
+          attributes: ['idalumno', 'apellido_alumno', 'nombre_alumno'],
+          include: [{
+            model: db.Nota,
+            as: 'Notas',
+            required: false, // LEFT JOIN para incluir alumnos sin notas
+            attributes: []  // No necesitamos datos de la tabla Notas
+          }]
+        })
       ]);
-      
-      
-  
+
       // Mapear los cursos con sus respectivos turnos
       const cursosFiltrados = cursos.map(item => ({
         idcurso: item.idcurso,
@@ -304,49 +304,49 @@ module.exports = {
         division_curso: item.division_curso,
         nombre_turno: item.Turno ? item.Turno.nombre_turno : 'Sin turno'
       }));
-  
+
       // Mapear los alumnos
       const alumnosFiltrados = alumnos.map(item => ({
         idalumno: item.idalumno,
         apellido_alumno: item.apellido_alumno,
         nombre_alumno: item.nombre_alumno
-      }));  
-  
+      }));
+
       // Renderizar la vista con los datos filtrados
       res.render('preceptor/materiaCursoAlumno', { cursosFiltrados, alumnosFiltrados });
     } catch (error) {
       console.error("Error:", error);
       res.status(500).send('Ocurrió un error en materia_curso y alumno.');
     }
-  },  
+  },
   unirMateriaCursoAlumno: async (req, res) => {
     try {
       let cursos = Array.isArray(req.body.cursos)
         ? req.body.cursos.map(Number).filter(n => !isNaN(n))
         : [Number(req.body.cursos)].filter(n => !isNaN(n));
-  
+
       let alumnos = Array.isArray(req.body.alumnos)
         ? req.body.alumnos.map(c => isNaN(Number(c)) ? null : Number(c)).filter(n => n !== null)
         : [Number(req.body.alumnos)].filter(n => !isNaN(n));
-      
+
       let errors = [];
-  
+
       // Verificar si alguno de los arrays está vacío o contiene NaN
       if (!cursos.length || !alumnos.length) {
         errors.push("Error: Faltan materias o alumnos para realizar la inscripción.");
       }
-  
+
       let materiascursos = await db.Materia_Curso.findAll({
         attributes: ['idmateriacurso'],
         where: { 'fk_idcurso_materiacurso': cursos }
       });
-  
+
       if (materiascursos.length === 0) {
         return res.redirect('/preceptor/usuario/materiacursoalumno');
       }
-      
+
       const materiasCursosFiltrados = materiascursos.map(item => item.idmateriacurso);
-  
+
       // Buscar combinaciones existentes de alumno-materiacurso
       let coincidencias = await db.Nota.findAll({
         where: {
@@ -354,20 +354,20 @@ module.exports = {
           fk_idmateriacurso_nota: materiasCursosFiltrados
         }
       });
-      
-      
+
+
       if (coincidencias.length > 0) {
         errors.push("Error: El alumno ya está inscrito en alguna materia y curso.");
       }
-  
+
       // Si hay errores, mostrarlos todos juntos
       if (errors.length > 0) {
         console.log(errors.join("\n"));
         return res.redirect('/preceptor/usuario/materiacursoalumno');
       }
-  
+
       const cicloLectivo = new Date().getFullYear().toString();
-  
+
       // Si no hay duplicados, realizar inserción
       let notas = alumnos.map(alumno => {
         return materiascursos.map(materiacurso => {
@@ -378,9 +378,9 @@ module.exports = {
           };
         });
       }).flat();
-      
+
       await db.Nota.bulkCreate(notas);
-  
+
       res.redirect('/preceptor/usuario/materiacursoalumno');
     } catch (error) {
       console.error("Error durante la operación:", error);
@@ -390,5 +390,4 @@ module.exports = {
       return res.status(500).send("Ocurrió un error inesperado. Por favor, inténtalo de nuevo.");
     }
   }
-  
 };

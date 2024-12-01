@@ -887,9 +887,11 @@ module.exports = {
 
             let data = [];
             let dataSelected = [];
+            let tabla = ""
 
             if (req.body.tabla === "Alumno") {
 
+                let tabla = "alumnos"
                 //llega variable alumnos
                 let data = await db.Alumno.findAll({
                     include: [
@@ -916,14 +918,16 @@ module.exports = {
                     Estado: alumno.dataValues.estado_alumno
                 }));
 
+                
                 // Verificar que dataSelected no esté vacío antes de obtener las claves
                 if (dataSelected.length > 0) {
                     data = Object.keys(dataSelected[0]);
                 } else {
                     data = []; // Si dataSelected está vacío, data también estará vacío
                 }
-                return res.render('admin/modificar/modificar', { data, dataSelected });
+                return res.render('admin/modificar/modificar', { data, dataSelected,tabla });
             } else if (req.body.tabla === "Docente") {
+                let tabla = "docentes"
                 let data = await db.Docente.findAll({
                     include: [
                         {
@@ -960,10 +964,11 @@ module.exports = {
                 } else {
                     data = []; // Si dataSelected está vacío, data también estará vacío
                 }
-                return res.render('admin/modificar/modificar', { data, dataSelected });
+                return res.render('admin/modificar/modificar', { data, dataSelected, tabla });
 
 
             } else if (req.body.tabla === "Usuario") {
+                let tabla = "usuarios"
                 let data = await db.Usuario.findAll({
                     include: [
                         {
@@ -996,10 +1001,11 @@ module.exports = {
                 } else {
                     data = []; // Si dataSelected está vacío, data también estará vacío
                 }
-                return res.render('admin/modificar/modificar', { data, dataSelected });
+                return res.render('admin/modificar/modificar', { data, dataSelected, tabla });
 
 
             } else if (req.body.tabla === "Tutor") {
+                let tabla = "tutores"
                 let data = await db.Tutor.findAll();
 
                 const dataSelected = data.map(tutor => ({
@@ -1018,9 +1024,10 @@ module.exports = {
                 } else {
                     data = []; // Si dataSelected está vacío, data también estará vacío
                 }
-                return res.render('admin/modificar/modificar', { data, dataSelected });
+                return res.render('admin/modificar/modificar', { data, dataSelected, tabla });
 
             } else if (req.body.tabla === "Curso") {
+                let tabla = "cursos"
                 let data = await db.Curso.findAll({
                     include: [
                         {
@@ -1048,9 +1055,10 @@ module.exports = {
                 } else {
                     data = []; // Si dataSelected está vacío, data también estará vacío
                 }
-                return res.render('admin/modificar/modificar', { data, dataSelected });
+                return res.render('admin/modificar/modificar', { data, dataSelected, tabla });
 
             } else if (req.body.tabla === "Materia") {
+                let tabla = "materias"
                 let data = await db.Materia.findAll();
 
                 const dataSelected = data.map(materia => ({
@@ -1065,7 +1073,7 @@ module.exports = {
                 } else {
                     data = []; // Si dataSelected está vacío, data también estará vacío
                 }
-                return res.render('admin/modificar/modificar', { data, dataSelected });
+                return res.render('admin/modificar/modificar', { data, dataSelected, tabla });
 
             }
 
@@ -1090,26 +1098,21 @@ module.exports = {
         }
     },
     eliminarDocente: async (req, res) => {
+        console.log("paso por docente ");
         try {
-            let iddocente = req.params.iddocente
-            // Busca el registro del docente
-            let docente = await db.docente.findByPk(iddocente);
-
+            let { id, estado } = req.body
+            let docente = await db.Docente.findOne({
+                where: {
+                    "dni_docente": id
+                }
+            })
             if (docente) {
-                // Elimina todas las referencias en la tabla docentees_materias
-                await db.docente_Materia.destroy({
-                    where: { fk_iddocente_docentemateria: iddocente }
-                });
-
-                // Elimina todas las referencias en la tabla usuarios
-                await db.Usuario.destroy({
-                    where: { fk_iddocente_usuario: iddocente }
-                });
-
-                // Elimina el docente
-                await db.docente.destroy({
-                    where: { iddocente }
-                });
+                await db.Docente.update(
+                    { "estado_docente": estado }, // Datos a actualizar
+                    {
+                        where: { dni_docente: id }  // Condición de búsqueda
+                    }
+                );
 
             }
             res.redirect('/administrador/usuario/modificar')
@@ -1119,11 +1122,12 @@ module.exports = {
         }
     },
     eliminarAlumno: async (req, res) => {
+        
         try {
-            let { dni, estado } = req.body
+            let { id, estado } = req.body
             let alumno = await db.Alumno.findOne({
                 where: {
-                    "dni_alumno": dni
+                    "dni_alumno": id
                 }
             })
 
@@ -1131,35 +1135,12 @@ module.exports = {
                 await db.Alumno.update(
                     { "estado_alumno": estado }, // Datos a actualizar
                     {
-                        where: { dni_alumno: dni }  // Condición de búsqueda
+                        where: { dni_alumno: id }  // Condición de búsqueda
                     }
                 );
 
             }
 
-            console.log(req.body);
-
-
-            // Busca el registro del docente
-            // let alumno = await db.Alumno.findByPk(idalumno);
-
-            // if (alumno) {
-            // // Elimina todas las referencias en la tabla docentees_materias
-            // await db.docente_Materia.destroy({
-            //     where: { fk_iddocente_docentemateria: iddocente }
-            // });
-
-            // // Elimina todas las referencias en la tabla usuarios
-            // await db.Usuario.destroy({
-            //     where: { fk_iddocente_usuario: iddocente }
-            // });
-
-            // Elimina el alumno
-            // await db.Alumno.destroy({
-            //     where: { idalumno }
-            // });
-
-            // }
             res.redirect('/administrador/usuario/modificar')
         } catch (error) {
             console.error("Error :", error);
