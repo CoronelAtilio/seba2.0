@@ -24,7 +24,8 @@ async function userLoggedMiddleware(req, res, next) {
                     attributes: ['nombre_rol']
                 }],
                 where: {
-                    nombre_usuario: cookieValue
+                    nombre_usuario: cookieValue,
+                    estado_usuario:1
                 }
             });
 
@@ -46,7 +47,8 @@ async function userLoggedMiddleware(req, res, next) {
                         }
                     ],
                     where: {
-                        fk_iddocente_materiacurso: usuarioCookie.fk_iddocente_usuario
+                        fk_iddocente_materiacurso: usuarioCookie.fk_iddocente_usuario,
+                        estado_materiacurso:1
                     }
                 });
 

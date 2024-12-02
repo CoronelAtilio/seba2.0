@@ -1085,12 +1085,23 @@ module.exports = {
     },
     eliminarUser: async (req, res) => {
         try {
-            let idusuario = req.params.idusuario
-            await db.Usuario.destroy({
+            let { id, estado } = req.body
+            console.log(id, estado);
+            
+            let usuario = await db.Usuario.findOne({
                 where: {
-                    idusuario
+                    "nombre_usuario": id
                 }
             })
+            if (usuario) {
+                await db.Usuario.update(
+                    { "estado_usuario": estado }, // Datos a actualizar
+                    {
+                        where: { nombre_usuario: id }  // Condición de búsqueda
+                    }
+                );
+
+            }
             res.redirect('/administrador/usuario/modificar')
         } catch (error) {
             console.error("Error :", error);
@@ -1098,7 +1109,6 @@ module.exports = {
         }
     },
     eliminarDocente: async (req, res) => {
-        console.log("paso por docente ");
         try {
             let { id, estado } = req.body
             let docente = await db.Docente.findOne({

@@ -60,7 +60,7 @@ router.get('/usuario/modificar/idmateria/:idmateria',adminControllers.modificarM
 
 //Eliminar
 // http://localhost:4000/administrador/usuario/modificar/:idusuario
-router.post('/usuario/modificar/:idusuario',adminControllers.eliminarUser)
+router.post('/usuario/modificar/usuarios/:idusuario',adminControllers.eliminarUser)
 
 // http://localhost:4000/administrador/usuario/modificar/docente/:idprofesor
 router.post('/usuario/modificar/docentes/:idprofesor',adminControllers.eliminarDocente)

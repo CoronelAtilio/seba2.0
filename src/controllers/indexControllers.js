@@ -29,7 +29,8 @@ module.exports = {
                 where: {
                     nombre_usuario: {
                         [Op.like]: loginUser
-                    }
+                    },
+                    estado_usuario:1
                 }
             });
     
@@ -74,7 +75,8 @@ module.exports = {
                     }
                 ],
                 where: {
-                    fk_iddocente_materiacurso: user.fk_iddocente_usuario
+                    fk_iddocente_materiacurso: user.fk_iddocente_usuario,
+                    estado_materiacurso:1
                 }
             });
             
